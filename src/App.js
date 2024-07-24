@@ -1,56 +1,14 @@
 import './App.css';
 import {useState, useEffect} from 'react';
 import axios from 'axios';
+import { Element } from './Components/element';
+import Button from './Components/button';
+import AnswerBar from './Components/answerBar';
+import styled from 'styled-components';
 
-const Button = ({name, onSubmit, disabled}) => {
-    const elStyle = {
-      padding: "10px",
-      margin: "0 10px 0 10px"
-    };
-    return <button disabled={disabled} style={elStyle} onClick={onSubmit}>{name}</button>
-};
-//what did we learn?
-const Element = ({name, selectable, selected, categoryLevel, onSelect, index}) => {
-    
-    const getBackgroundColor = () => {
-        if(categoryLevel === 0) return selected ? "gray" : "white";
-        const colorVal = {
-          "1": "yellow",
-          "2": "green",
-          "3": "blue",
-          "4": "purple",
-        }
-        return colorVal[ categoryLevel + ""];
-    }
-    const elStyle = {
-      padding: "10px",
-      pointerEvents: selectable ? "auto" : "none",
-      backgroundColor: getBackgroundColor(),
-    };
-    return <div style={elStyle} onClick={() => {
-      onSelect(index)}
-    }>{name}</div>;
-};
-
-const colorVal = {
-  "1": "yellow",
-  "2": "green",
-  "3": "blue",
-  "4": "purple",
-};
 
 //what did we learn?
-const AnswerBar = ({elements, categoryLevel, index, description}) => {
-    const elStyle = {
-      padding: "10px",
-      backgroundColor: colorVal[categoryLevel + ""]
-    };
-    return <div style={elStyle}>{description}
-        <div>
-        {elements.map(el => el.name).join(" ")}<
-        /div>
-        </div>;
-};
+
 
 function App() {
 
@@ -60,8 +18,6 @@ function App() {
   const [guesses, setGuesses] = useState(0);
   const [answers, setAnswers] = useState([]);
   const [input, setInput] = useState("");
-
-
 
   //make sure we know useeffect stuff
   useEffect(() => {   
@@ -100,7 +56,7 @@ function App() {
   const shuffleBoard = () => {
       let ind = board.length;
       const newBoard = [...board];
-      while(ind != 0){
+      while(ind !== 0){
           const randomIndex = Math.floor(Math.random() * ind);
           ind--;
           [newBoard[ind], newBoard[randomIndex]] = [newBoard[randomIndex], newBoard[ind]];
@@ -118,7 +74,7 @@ function App() {
   const onSubmit = () => {
     setLoading(true);
     const elements = board.filter(el => el.selected);
-    if(elements.length != 4) return;
+    if(elements.length !== 4) return;
 
     //const response = await connectValues(values);
     axios.post('http://localhost:3001/connect', {
@@ -171,52 +127,73 @@ function App() {
       return loading || !fourSelected() || ((hardMode || answers.length === 3) && input.length === 0)
   }
 
+  const guessDots = [];
+  for(let i = 0; i < guesses; i++){
+    guessDots.push(<Dot/>);
+  }
+
   return (
     <div className="App">
-      Lonely Connect
-      <div>
+      <Title>Lonely Connect</Title>
+      <HardMode>
         <input disabled={answers.length > 0} type="checkbox" value={hardMode} onInput={() => setHardMode(!hardMode)} /> Hard Mode
-      </div>
+      </HardMode>
       <div style={{
         display: "grid",
         gridTemplateColumns: "auto"
       }}>
-        {answers.map((el, i) => {
-          return <AnswerBar 
+        {answers.map((el, i) => <AnswerBar 
             {...el}
             elements={el.answers || []}
             index={i}
             key={i}
-          />;
-      })}
+          />)}
       </div>
       <div style={{
         display: "grid",
         gridTemplateColumns: "auto auto auto auto"
       }}>
-      {board.map((el, i) => {
-        // const selected = selectedInd.indexOf(i) > -1;
-        // const selectable = !loading && (selectedInd.length < 4 || selected)
-        return <Element 
+      {board.map((el, i) => <Element 
           {...el}
           selectable={el.selectable && !loading && (!fourSelected() || el.selected)}   
           index={i}
           key={i} 
-          onSelect={onTapElement} />;
-      })}
+          onSelect={onTapElement} />)}
       </div>
       {(hardMode || answers.length === 3) && <div>{answers.length === 3 ? "Final " : ""} Connection: <input value={input} onInput={e => setInput(e.target.value)} /></div>}
+      <Guesses>
+          Incorrect Guesses: {guessDots}
+      </Guesses>
       <div>
           <Button name="Shuffle" onSubmit={shuffleBoard}/>
           <Button name="Deselect" disabed={board.filter(el => el.selected).length === 0} onSubmit={deselectBoard}/>
           <Button name="Submit" disabled={preventSubmit()} onSubmit={onSubmit}/>
       </div>
-      <div>
-          Incorrect Guesses: {guesses}
-      </div>
     </div>
   );
 }
 
+const Guesses = styled.div`
+  margin: 10px 0 20px 0;
+`;
+
+const Dot = styled.div`
+  height: 16px;
+  width: 16px;
+  background-color: #555555;
+  color: red;
+  margin: 0 5px 0 5px;
+  border-radius: 50%;
+  display: inline-block;
+`;
+
+const Title = styled.h1`
+`;
+
+const HardMode = styled.div`
+  justify-content: right;
+  display: flex;
+  font-weight: bold;
+`;
 
 export default App;
