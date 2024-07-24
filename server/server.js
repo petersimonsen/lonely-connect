@@ -32,11 +32,11 @@ app.post('/connect', (req, res) => {
 			connections[category] = connections[category] + 1;
 		}
 	});
-	console.log(connections);
+	// console.log(connections);
 	const connectVals = Object.values(connections);
 	
 	const correct = connectVals[0] === 4;
-	const categoryLevel = Object.keys(connections)[0];
+	const categoryLevel = Number.parseInt(Object.keys(connections)[0]);
 	// console.log(connectVals);
 	res.send({
 		correct,
