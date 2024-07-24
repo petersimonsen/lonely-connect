@@ -15,13 +15,8 @@ app.get('/board', (req, res) => {
 	res.send(board);
 });
 
-//express basics and core response issues
-
-app.post('/connect', (req, res) => {
-	const sorted = req.body.values.sort();
-	if(sorted.length !== 4) {
-		return res.status(400).send("Bad Request");
-	}
+const connectionsFromSubmittedVals = (submittedVals) => {
+	const sorted = submittedVals.sort();
 	let connections = {};
 	sorted.forEach((val) => {
 		const totalInd = sortedSolve.indexOf(val);
@@ -32,19 +27,40 @@ app.post('/connect', (req, res) => {
 			connections[category] = connections[category] + 1;
 		}
 	});
-	// console.log(connections);
+	return connections;
+}
+
+const respondToConnections = (connections) => {
 	const connectVals = Object.values(connections);
 	
 	const correct = connectVals[0] === 4;
 	const categoryLevel = Number.parseInt(Object.keys(connections)[0]);
-	// console.log(connectVals);
-	res.send({
+	
+	return {
 		correct,
 		alreadyGuessed: false,
 		categoryDescription: correct ? solve[categoryLevel].desc : "",
-		categoryLevel: correct ? categoryLevel : null,
-		oneAway: connectVals.indexOf(3) > -1
-	});
+		categoryLevel: correct ? categoryLevel + 1 : null,
+		oneAway: connectVals.indexOf(3) > -1,
+		descriptionWrong: false
+	};
+}
+//express basics and core response issues
+
+app.post('/connect', (req, res) => {
+	const submittedValues = req.body.values;
+	if(submittedValues.length !== 4) {
+		return res.status(400).send("Bad Request");
+	}
+
+	const connections = connectionsFromSubmittedVals(submittedValues);
+	const response = respondToConnections(connections);
+	const description = req.body.description;
+	if(response["correct"] && description && description !== response["categoryDescription"]){
+		response["categoryDescription"] = "";
+		response["descriptionWrong"] = true;
+	}
+	res.send(response);
 });
 
 app.listen(port, () => {

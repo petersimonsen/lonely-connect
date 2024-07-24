@@ -1,6 +1,5 @@
 import './App.css';
 import {useState, useEffect} from 'react';
-// import testData from './connect.json';
 import axios from 'axios';
 
 const Button = ({name, onSubmit, disabled}) => {
@@ -44,7 +43,7 @@ const colorVal = {
 const AnswerBar = ({elements, categoryLevel, index, description}) => {
     const elStyle = {
       padding: "10px",
-      backgroundColor: colorVal[ (categoryLevel + 1)  + ""]
+      backgroundColor: colorVal[categoryLevel + ""]
     };
     return <div style={elStyle}>{description}
         <div>
@@ -57,8 +56,12 @@ function App() {
 
   const [board, setBoard] = useState(Array(16).fill({}));
   const [loading, setLoading] = useState(false);
+  const [hardMode, setHardMode] = useState(false);
   const [guesses, setGuesses] = useState(0);
   const [answers, setAnswers] = useState([]);
+  const [input, setInput] = useState("");
+
+
 
   //make sure we know useeffect stuff
   useEffect(() => {   
@@ -70,10 +73,11 @@ function App() {
           categoryLevel: 0,
           selected: false
         })));
+        setAnswers([]);
       })
       .catch(err => console.log(err));
       
-  }, [setBoard]); 
+  }, [setBoard, setAnswers]); 
 
   const onTapElement = (i) => {
       const newBoard = [...board];
@@ -93,6 +97,17 @@ function App() {
       setBoard(newBoard);
   }
 
+  const shuffleBoard = () => {
+      let ind = board.length;
+      const newBoard = [...board];
+      while(ind != 0){
+          const randomIndex = Math.floor(Math.random() * ind);
+          ind--;
+          [newBoard[ind], newBoard[randomIndex]] = [newBoard[randomIndex], newBoard[ind]];
+      }
+      setBoard(newBoard);
+  }
+
   const reconfigureBoard = (answerElements) => {
       const currentAnswerNames = answers.reduce((elements, el) => elements.concat(el.answers), []).concat(answerElements).map(el => el.name);
       console.log(currentAnswerNames);
@@ -107,7 +122,8 @@ function App() {
 
     //const response = await connectValues(values);
     axios.post('http://localhost:3001/connect', {
-        values: elements.map(el => el.name)
+        values: elements.map(el => el.name),
+        description: input
     }, {
       headers: {
         'Content-Type': 'application/json'
@@ -117,7 +133,11 @@ function App() {
        
         const response = data.data;
         setLoading(false);
-        if(response["correct"]){
+        if(response["correct"] && response["descriptionWrong"]){
+            alert("Not the connection!");
+            setGuesses(guesses + 1);
+            setInput("");
+        } else if(response["correct"]){
            const answerElements = elements.map((el) => ({
               name: el.name,
               selected: false,
@@ -130,6 +150,7 @@ function App() {
             answers: answerElements
           }]);
           setAnswers(updatedAnswers);
+          setInput("");
           deselectBoard();
           reconfigureBoard(answerElements);
         } else {
@@ -146,9 +167,16 @@ function App() {
     
   }
 
+  const preventSubmit = () => {
+      return loading || !fourSelected() || ((hardMode || answers.length === 3) && input.length === 0)
+  }
+
   return (
     <div className="App">
       Lonely Connect
+      <div>
+        <input disabled={answers.length > 0} type="checkbox" value={hardMode} onInput={() => setHardMode(!hardMode)} /> Hard Mode
+      </div>
       <div style={{
         display: "grid",
         gridTemplateColumns: "auto"
@@ -158,6 +186,7 @@ function App() {
             {...el}
             elements={el.answers || []}
             index={i}
+            key={i}
           />;
       })}
       </div>
@@ -171,14 +200,16 @@ function App() {
         return <Element 
           {...el}
           selectable={el.selectable && !loading && (!fourSelected() || el.selected)}   
-          index={i} 
+          index={i}
+          key={i} 
           onSelect={onTapElement} />;
       })}
       </div>
+      {(hardMode || answers.length === 3) && <div>{answers.length === 3 ? "Final " : ""} Connection: <input value={input} onInput={e => setInput(e.target.value)} /></div>}
       <div>
-          <Button name="Shuffle" onSubmit={() => {}}/>
+          <Button name="Shuffle" onSubmit={shuffleBoard}/>
           <Button name="Deselect" disabed={board.filter(el => el.selected).length === 0} onSubmit={deselectBoard}/>
-          <Button name="Submit" disabled={loading || !fourSelected()} onSubmit={onSubmit}/>
+          <Button name="Submit" disabled={preventSubmit()} onSubmit={onSubmit}/>
       </div>
       <div>
           Incorrect Guesses: {guesses}
