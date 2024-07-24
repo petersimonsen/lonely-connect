@@ -33,6 +33,25 @@ const Element = ({name, selectable, selected, categoryLevel, onSelect, index}) =
     }>{name}</div>;
 };
 
+const colorVal = {
+  "1": "yellow",
+  "2": "green",
+  "3": "blue",
+  "4": "purple",
+};
+
+//what did we learn?
+const AnswerBar = ({elements, categoryLevel, index, description}) => {
+    const elStyle = {
+      padding: "10px",
+      backgroundColor: colorVal[ (categoryLevel + 1)  + ""]
+    };
+    return <div style={elStyle}>{description}
+        <div>
+        {elements.map(el => el.name).join(" ")}<
+        /div>
+        </div>;
+};
 
 function App() {
 
@@ -74,15 +93,11 @@ function App() {
       setBoard(newBoard);
   }
 
-  const reconfigureBoard = (updatedAnswers) => {
-      const answeredVals = board.filter((el) => {
-          return !el.selectable && el.categoryLevel > 0;
-      });
-      const answerVals = answeredVals.concat(updatedAnswers);
-      const answerNames = answerVals.map(el => el.name);
-      console.log(answerVals);
-      const unAnsweredBoard = board.filter((el) => answerNames.indexOf(el.name) === -1);
-      setBoard(answerVals.concat(unAnsweredBoard));
+  const reconfigureBoard = (answerElements) => {
+      const currentAnswerNames = answers.reduce((elements, el) => elements.concat(el.answers), []).concat(answerElements).map(el => el.name);
+      console.log(currentAnswerNames);
+      const unAnsweredBoard = board.filter((el) => currentAnswerNames.indexOf(el.name) === -1);
+      setBoard(unAnsweredBoard);
   };
 
   const onSubmit = () => {
@@ -103,18 +118,19 @@ function App() {
         const response = data.data;
         setLoading(false);
         if(response["correct"]){
-          
-          const updatedAnswers = answers.concat([{
-            categoryLevel: response["categoryLevel"],
-            description: response["categoryDescription"],
-          }]);
-          setAnswers(updatedAnswers);
-          const answerElements = elements.map((el) => ({
+           const answerElements = elements.map((el) => ({
               name: el.name,
               selected: false,
               selectable: false,
               categoryLevel: response["categoryLevel"] + 1
             }));
+          const updatedAnswers = answers.concat([{
+            categoryLevel: response["categoryLevel"],
+            description: response["categoryDescription"],
+            answers: answerElements
+          }]);
+          setAnswers(updatedAnswers);
+          deselectBoard();
           reconfigureBoard(answerElements);
         } else {
           if(response.oneAway) alert("One Away");
@@ -135,6 +151,18 @@ function App() {
       Lonely Connect
       <div style={{
         display: "grid",
+        gridTemplateColumns: "auto"
+      }}>
+        {answers.map((el, i) => {
+          return <AnswerBar 
+            {...el}
+            elements={el.answers || []}
+            index={i}
+          />;
+      })}
+      </div>
+      <div style={{
+        display: "grid",
         gridTemplateColumns: "auto auto auto auto"
       }}>
       {board.map((el, i) => {
@@ -144,7 +172,7 @@ function App() {
           {...el}
           selectable={el.selectable && !loading && (!fourSelected() || el.selected)}   
           index={i} 
-          onSelect={onTapElement} />
+          onSelect={onTapElement} />;
       })}
       </div>
       <div>
