@@ -7,7 +7,7 @@ import AnswerBar from './Components/answerBar';
 import styled from 'styled-components';
 
 
-const SERVER_URL = 'http://localhost:3001';
+const SERVER_URL = 'http://localhost:8080';
 
 //what did we learn?
 function App() {

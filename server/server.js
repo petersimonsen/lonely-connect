@@ -1,55 +1,24 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
-const port = 3001;
+const path = require('path');
+const port = 8080;
 const board = require('./connect.json');
 const solve =  require('./solve.json');
-const sortedSolve = solve.map((info) => {
-	return info["val"].sort();
-}).flat();
+const { connectionsFromSubmittedVals, respondToConnections, matchDescription } = require('./serverUtils');
+
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static(path.join(__dirname, '../build')));
+
+app.get('/', function(req, res) {
+	res.sendFile(path.join(__dirname, '../build', 'index.html'));
+});
 
 app.get('/board', (req, res) => {
 	res.send(board);
 });
-
-const connectionsFromSubmittedVals = (submittedVals) => {
-	const sorted = submittedVals.sort();
-	let connections = {};
-	sorted.forEach((val) => {
-		const totalInd = sortedSolve.indexOf(val);
-		const category = Math.floor(totalInd / 4);
-		if(!connections[category]) {
-			connections[category] = 1;	
-		} else {
-			connections[category] = connections[category] + 1;
-		}
-	});
-	return connections;
-}
-
-const respondToConnections = (connections) => {
-	const connectVals = Object.values(connections);
-	
-	const correct = connectVals[0] === 4;
-	const categoryLevel = Number.parseInt(Object.keys(connections)[0]);
-	
-	return {
-		correct,
-		categoryDescription: correct ? solve[categoryLevel].desc : "",
-		categoryLevel: correct ? categoryLevel + 1 : null,
-		oneAway: connectVals.indexOf(3) > -1,
-		descriptionWrong: false
-	};
-}
-
-const matchDescription = (desc, input) => {
-	const decentLengthMatch = input.length / desc.length > 0.5;
-	const contains = desc.trim().toLowerCase().includes(input.trim().toLowerCase());
-	return contains && decentLengthMatch;
-}
 
 app.post('/connect', (req, res) => {
 	const submittedValues = req.body.values;
