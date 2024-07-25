@@ -7,9 +7,9 @@ import AnswerBar from './Components/answerBar';
 import styled from 'styled-components';
 
 
+const SERVER_URL = 'http://localhost:3001';
+
 //what did we learn?
-
-
 function App() {
 
   const [board, setBoard] = useState(Array(16).fill({}));
@@ -21,7 +21,7 @@ function App() {
 
   //make sure we know useeffect stuff
   useEffect(() => {   
-      axios.get('http://localhost:3001/board')
+      axios.get(`${SERVER_URL}/board`)
       .then(data => {
         setBoard(data.data.flat().map((name) => ({
           name,
@@ -72,7 +72,6 @@ function App() {
 
   const reconfigureBoard = (answerElements) => {
       const currentAnswerNames = answers.reduce((elements, el) => elements.concat(el.answers), []).concat(answerElements).map(el => el.name);
-      console.log(currentAnswerNames);
       const unAnsweredBoard = board.filter((el) => currentAnswerNames.indexOf(el.name) === -1);
       setBoard(unAnsweredBoard);
   };
@@ -83,7 +82,7 @@ function App() {
     if(elements.length !== 4) return;
 
     //const response = await connectValues(values);
-    axios.post('http://localhost:3001/connect', {
+    axios.post(`${SERVER_URL}/connect`, {
         values: elements.map(el => el.name),
         description: input
     }, {
@@ -130,7 +129,7 @@ function App() {
   }
 
   const solvePuzzle = () => {
-      axios.post('http://localhost:3001/solve', {
+      axios.post(`${SERVER_URL}/solve`, {
         answers
       },{
           headers: {
@@ -153,11 +152,7 @@ function App() {
                   answers: mappedAnswers,
                 });
             });
-          console.log(currAnswers);
           setAnswers(currAnswers);
-          // reconfigureBoard();
-          // setBoard([]);
-
             
       }).catch(() => {});
         };
