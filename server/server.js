@@ -45,7 +45,12 @@ const respondToConnections = (connections) => {
 		descriptionWrong: false
 	};
 }
-//express basics and core response issues
+
+const matchDescription = (desc, input) => {
+	const decentLengthMatch = input.length / desc.length > 0.5;
+	const contains = desc.trim().toLowerCase().includes(input.trim().toLowerCase());
+	return contains && decentLengthMatch;
+}
 
 app.post('/connect', (req, res) => {
 	const submittedValues = req.body.values;
@@ -56,7 +61,7 @@ app.post('/connect', (req, res) => {
 	const connections = connectionsFromSubmittedVals(submittedValues);
 	const response = respondToConnections(connections);
 	const description = req.body.description;
-	if(response["correct"] && description && description !== response["categoryDescription"]){
+	if(response["correct"] && description && description.length > 0 && !matchDescription(description, response["categoryDescription"])){
 		response["categoryDescription"] = "";
 		response["descriptionWrong"] = true;
 	}

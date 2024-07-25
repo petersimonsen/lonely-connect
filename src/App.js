@@ -15,7 +15,7 @@ function App() {
   const [board, setBoard] = useState(Array(16).fill({}));
   const [loading, setLoading] = useState(false);
   const [hardMode, setHardMode] = useState(false);
-  const [guesses, setGuesses] = useState(0);
+  const [guesses, setGuesses] = useState(4);
   const [answers, setAnswers] = useState([]);
   const [input, setInput] = useState("");
 
@@ -91,7 +91,7 @@ function App() {
         setLoading(false);
         if(response["correct"] && response["descriptionWrong"]){
             alert("Not the connection!");
-            setGuesses(guesses + 1);
+            setGuesses(guesses - 1);
             setInput("");
         } else if(response["correct"]){
            const answerElements = elements.map((el) => ({
@@ -111,7 +111,7 @@ function App() {
           reconfigureBoard(answerElements);
         } else {
           if(response.oneAway) alert("One Away");
-          setGuesses(guesses + 1); //only if not guessed before      
+          setGuesses(guesses - 1); //only if not guessed before      
         }
         
     
@@ -124,7 +124,7 @@ function App() {
   }
 
   const preventSubmit = () => {
-      return loading || !fourSelected() || ((hardMode || answers.length === 3) && input.length === 0)
+      return guesses <= 0 || loading || !fourSelected() || ((hardMode || answers.length === 3) && input.length === 0)
   }
 
   const guessDots = [];
@@ -160,9 +160,9 @@ function App() {
           key={i} 
           onSelect={onTapElement} />)}
       </div>
-      {(hardMode || answers.length === 3) && <div>{answers.length === 3 ? "Final " : ""} Connection: <input value={input} onInput={e => setInput(e.target.value)} /></div>}
+      {(hardMode || answers.length === 3) && <ConnectInput>{answers.length === 3 ? "Final " : ""} Connection: <input value={input} onInput={e => setInput(e.target.value)} /></ConnectInput>}
       <Guesses>
-          Incorrect Guesses: {guessDots}
+          Remaining Guesses: {guessDots}
       </Guesses>
       <div>
           <Button name="Shuffle" onSubmit={shuffleBoard}/>
@@ -172,6 +172,11 @@ function App() {
     </div>
   );
 }
+
+const ConnectInput = styled.div`
+  font-weight: bold;
+  margin: 10px 0 20px 0;
+`;
 
 const Guesses = styled.div`
   margin: 10px 0 20px 0;
