@@ -6,8 +6,7 @@ import Button from './Components/button';
 import AnswerBar from './Components/answerBar';
 import styled from 'styled-components';
 
-
-const SERVER_URL = 'http://localhost:8080';
+const SERVER_URL = process.env.REACT_APP_HOST_URL;
 
 //what did we learn?
 function App() {
