@@ -38,7 +38,6 @@ const respondToConnections = (connections) => {
 	
 	return {
 		correct,
-		alreadyGuessed: false,
 		categoryDescription: correct ? solve[categoryLevel].desc : "",
 		categoryLevel: correct ? categoryLevel + 1 : null,
 		oneAway: connectVals.indexOf(3) > -1,
@@ -66,6 +65,13 @@ app.post('/connect', (req, res) => {
 		response["descriptionWrong"] = true;
 	}
 	res.send(response);
+});
+
+app.post('/solve', (req, res) => {
+	const submittedAnswers = req.body.answers;
+	const answerNames = submittedAnswers.reduce((elements, el) => elements.concat(el.answers), []).map(el => el.name);
+    const otherSolves = solve.filter((el) => !el.val.some((name) => answerNames.indexOf(name) != -1));
+    res.send(otherSolves);
 });
 
 app.listen(port, () => {

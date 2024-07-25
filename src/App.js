@@ -35,6 +35,12 @@ function App() {
       
   }, [setBoard, setAnswers]); 
 
+  useEffect(() => {
+    if(guesses === 0){
+        solvePuzzle();
+    }
+  }, [guesses])
+
   const onTapElement = (i) => {
       const newBoard = [...board];
       newBoard[i].selected = !newBoard[i].selected;
@@ -123,6 +129,39 @@ function App() {
     
   }
 
+  const solvePuzzle = () => {
+      axios.post('http://localhost:3001/solve', {
+        answers
+      },{
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+          .then(data => {
+            const solutions = data.data;
+            const currAnswers = [...answers];
+            const answerElements = solutions.forEach((el) => {
+              const mappedAnswers = el["val"].map((name) => ({
+                      name,
+                      selected: false,
+                      selectable: false,
+                      categoryLevel: el["level"]
+                    }));
+                currAnswers.push({
+                  categoryLevel: el["level"],
+                  description: el["desc"],
+                  answers: mappedAnswers,
+                });
+            });
+          console.log(currAnswers);
+          setAnswers(currAnswers);
+          // reconfigureBoard();
+          // setBoard([]);
+
+            
+      }).catch(() => {});
+        };
+
   const preventSubmit = () => {
       return guesses <= 0 || loading || !fourSelected() || ((hardMode || answers.length === 3) && input.length === 0)
   }
@@ -153,7 +192,7 @@ function App() {
         display: "grid",
         gridTemplateColumns: "auto auto auto auto"
       }}>
-      {board.map((el, i) => <Element 
+      {guesses > 0 && board.map((el, i) => <Element 
           {...el}
           selectable={el.selectable && !loading && (!fourSelected() || el.selected)}   
           index={i}

@@ -1,6 +1,6 @@
 [
-	{ "desc": "one", "val": ["1B", "1A", "1C", "1D"]},
-	{ "desc": "two", "val": ["2A", "2B", "2C", "2D"]},
-	{ "desc": "three", "val": ["3A", "3B", "3C", "3D"]},
-	{ "desc": "four", "val": ["4A", "4B", "4C", "4D"]}
+	{ "desc": "one", "val": ["1B", "1A", "1C", "1D"], "level": 1},
+	{ "desc": "two", "val": ["2A", "2B", "2C", "2D"], "level": 2},
+	{ "desc": "three", "val": ["3A", "3B", "3C", "3D"], "level": 3},
+	{ "desc": "four", "val": ["4A", "4B", "4C", "4D"], "level": 4}
 ]
