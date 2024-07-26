@@ -35,7 +35,7 @@ function App() {
       })
       .catch(err => console.log(err));
       
-  }, [setBoard, setAnswers]); 
+  }, [setBoard, setAnswers, paintMode]); 
 
   useEffect(() => {
     if(guesses === 0){
@@ -83,11 +83,38 @@ function App() {
       setBoard(unAnsweredBoard);
   };
 
+  const submitPaint = () => {
+      axios.post(`${SERVER_URL}/paint`, {
+          values: board,
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+        .then(data => {
+            const { correct, answers: updatedAnswers } = data.data;
+            if(!correct){
+              alert("Incorrect Paint");
+              setGuesses(guesses - 1);
+              setLoading(false);
+              return;
+            }
+            setAnswers(updatedAnswers);
+            deselectBoard();
+            setBoard([]);
+
+        }).catch(err => {
+          setLoading(false)
+          console.log(err)
+        });
+      ;
+  }
+
   const onSubmit = () => {
     setLoading(true);
     const elements = board.filter(el => el.selected);
     if(elements.length !== requiredSelection()) return;
-
+    if(paintMode) return submitPaint();
     //const response = await connectValues(values);
     axios.post(`${SERVER_URL}/connect`, {
         values: elements.map(el => el.name),
@@ -173,7 +200,6 @@ function App() {
         } else if(catLevelCount !== 0){
           dict[`${catLevelCount}`] = 1;
         }
-        console.log(dict);
         return dict;
       }, {})).some((val) => val !== 4);
       return guesses <= 0 || loading || !maxSelected() || hardModeIssues || paintModeIssues;
@@ -195,8 +221,10 @@ function App() {
       </HardMode>
       <HardMode>
         <input disabled={answers.length > 0} type="checkbox" value={paintMode} onInput={() => {
+          setCatColor(!paintMode ? 1 : 0);
           setPaintMode(!paintMode);
           setHardMode(false);
+          deselectBoard();
         }} /> Paint Mode
       </HardMode>
       <div style={{
@@ -236,8 +264,6 @@ function App() {
     </div>
   );
 }
-
-// const 
 
 
 const ColorBox = styled.div`

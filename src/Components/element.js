@@ -1,3 +1,4 @@
+import { colorVal } from './Utils';
 
 export const elStyle = {
   margin: "10px",
@@ -16,12 +17,6 @@ export const Element = ({name, selectable, selected, categoryLevel, onSelect, in
     
     const getBackgroundColor = () => {
         if(categoryLevel === 0) return selected ? "#555555" : "#eeeeee";
-        const colorVal = {
-          "1": "yellow",
-          "2": "green",
-          "3": "blue",
-          "4": "purple",
-        }
         return colorVal[ categoryLevel + ""];
     }
     

@@ -5,7 +5,13 @@ const path = require('path');
 const port = process.env.PORT || 8080;
 const board = require('./connect.json');
 const solve =  require('./solve.json');
-const { connectionsFromSubmittedVals, respondToConnections, matchDescription } = require('./serverUtils');
+const { 
+	connectionsFromSubmittedVals, 
+	respondToConnections, 
+	matchDescription,
+	checkPaintConnections,
+	paintDescriptionsByCategory,
+	 } = require('./serverUtils');
 
 
 app.use(cors());
@@ -34,6 +40,26 @@ app.post('/connect', (req, res) => {
 		response["descriptionWrong"] = true;
 	}
 	res.send(response);
+});
+
+app.post('/paint', (req, res) => {
+	const submittedValues = req.body.values;
+	if(submittedValues.length !== 16) {
+		return res.status(400).send("Bad Request");
+	}
+
+	const correct = checkPaintConnections(submittedValues);
+	if(!correct){
+		res.send({correct: false});
+		return;
+	}
+	const answers = paintDescriptionsByCategory(submittedValues);
+
+	res.send({
+		correct: true,
+		answers
+	});
+
 });
 
 app.post('/solve', (req, res) => {
