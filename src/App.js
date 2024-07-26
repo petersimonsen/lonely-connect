@@ -61,6 +61,7 @@ function App() {
   const deselectBoard = () => {
       const newBoard = board.map((el) => {
         el.selected = false;
+        el.categoryLevel = 0;
         return el;
       });
       setBoard(newBoard);
