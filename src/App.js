@@ -210,9 +210,20 @@ function App() {
     guessDots.push(<Dot/>);
   }
 
+  
+  let details = "You must describe the connection of the final category.";
+  if(hardMode) details = "You must describe the connection for EACH category."
+  if(paintMode) details = "You may only submit a valid 4x4 board. Categories may have any color.";
+
+  // const instructions = `Find the four connections between each element.\n ${details}`;
   return (
     <div className="App">
       <Title>Lonely Connect</Title>
+      <SubTitle>
+      <Instr>
+        <InstrText>Connect each element into one of four categories.<br/>{details}</InstrText>
+      </Instr>
+      <div>
       <HardMode>
         <input disabled={answers.length > 0} type="checkbox" value={hardMode} onInput={() => {
           setHardMode(!hardMode)
@@ -227,6 +238,8 @@ function App() {
           deselectBoard();
         }} /> Paint Mode
       </HardMode>
+      </div>
+      </SubTitle>
       <div style={{
         display: "grid",
         gridTemplateColumns: "auto"
@@ -265,6 +278,25 @@ function App() {
   );
 }
 
+const InstrText = styled.h5`
+  display: inline;
+`;
+
+const Instr = styled.div`
+  width: 70%;
+  text-align: left;
+  color: #888888;
+  border: 1px solid #888888;
+  padding: 5px;
+  border-radius: 10px;
+`;
+
+const SubTitle = styled.div`
+  display: flex;
+  font-weight: bold;
+  margin: 10px;
+  justify-content: space-around;
+`;
 
 const ColorBox = styled.div`
   height: 40px;
@@ -301,7 +333,6 @@ const Title = styled.h1`
 const HardMode = styled.div`
   justify-content: right;
   display: flex;
-  font-weight: bold;
 `;
 
 export default App;
