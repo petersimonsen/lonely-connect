@@ -5,6 +5,7 @@ import { Element } from './Components/element';
 import Button from './Components/button';
 import AnswerBar from './Components/answerBar';
 import styled from 'styled-components';
+import { colorVal } from './Components/Utils';
 
 const SERVER_URL = process.env.REACT_APP_HOST_URL;
 
@@ -14,9 +15,11 @@ function App() {
   const [board, setBoard] = useState(Array(16).fill({}));
   const [loading, setLoading] = useState(false);
   const [hardMode, setHardMode] = useState(false);
+  const [paintMode, setPaintMode] = useState(false);
   const [guesses, setGuesses] = useState(4);
   const [answers, setAnswers] = useState([]);
   const [input, setInput] = useState("");
+  const [catColor, setCatColor] = useState();
 
   //make sure we know useeffect stuff
   useEffect(() => {   
@@ -43,11 +46,16 @@ function App() {
   const onTapElement = (i) => {
       const newBoard = [...board];
       newBoard[i].selected = !newBoard[i].selected;
+      if(paintMode && catColor && catColor > 0){
+          newBoard[i].categoryLevel = (newBoard[i].selected) ? catColor : 0;
+      }
       setBoard(newBoard);
   };
 
-  const fourSelected = () => {
-      return board.filter(el => el.selected).length >= 4;
+  const requiredSelection = () => paintMode ? 16 : 4;
+
+  const maxSelected = () => {
+      return board.filter(el => el.selected).length >= requiredSelection();
   }
 
   const deselectBoard = () => {
@@ -78,7 +86,7 @@ function App() {
   const onSubmit = () => {
     setLoading(true);
     const elements = board.filter(el => el.selected);
-    if(elements.length !== 4) return;
+    if(elements.length !== requiredSelection()) return;
 
     //const response = await connectValues(values);
     axios.post(`${SERVER_URL}/connect`, {
@@ -157,7 +165,18 @@ function App() {
         };
 
   const preventSubmit = () => {
-      return guesses <= 0 || loading || !fourSelected() || ((hardMode || answers.length === 3) && input.length === 0)
+      const hardModeIssues = ((hardMode || answers.length === 3) && input.length === 0);
+      const paintModeIssues = paintMode && Object.values(board.reduce((dict, el) => {
+        const catLevelCount = el["categoryLevel"];
+        if(dict[`${catLevelCount}`]){
+          dict[`${catLevelCount}`] = dict[`${catLevelCount}`] + 1;
+        } else if(catLevelCount !== 0){
+          dict[`${catLevelCount}`] = 1;
+        }
+        console.log(dict);
+        return dict;
+      }, {})).some((val) => val !== 4);
+      return guesses <= 0 || loading || !maxSelected() || hardModeIssues || paintModeIssues;
   }
 
   const guessDots = [];
@@ -169,7 +188,16 @@ function App() {
     <div className="App">
       <Title>Lonely Connect</Title>
       <HardMode>
-        <input disabled={answers.length > 0} type="checkbox" value={hardMode} onInput={() => setHardMode(!hardMode)} /> Hard Mode
+        <input disabled={answers.length > 0} type="checkbox" value={hardMode} onInput={() => {
+          setHardMode(!hardMode)
+          setPaintMode(false);
+        }} /> Hard Mode
+      </HardMode>
+      <HardMode>
+        <input disabled={answers.length > 0} type="checkbox" value={paintMode} onInput={() => {
+          setPaintMode(!paintMode);
+          setHardMode(false);
+        }} /> Paint Mode
       </HardMode>
       <div style={{
         display: "grid",
@@ -188,12 +216,15 @@ function App() {
       }}>
       {guesses > 0 && board.map((el, i) => <Element 
           {...el}
-          selectable={el.selectable && !loading && (!fourSelected() || el.selected)}   
+          selectable={el.selectable && !loading && (!maxSelected() || el.selected)}   
           index={i}
           key={i} 
           onSelect={onTapElement} />)}
       </div>
       {(hardMode || answers.length === 3) && <ConnectInput>{answers.length === 3 ? "Final " : ""} Connection: <input value={input} onInput={e => setInput(e.target.value)} /></ConnectInput>}
+      {paintMode && <div>{Object.keys(colorVal).map((key) => {
+        return <ColorBox selected={key === `${catColor}`} color={colorVal[key]} onClick={() => setCatColor(Number(key))} />
+      })}</div>}
       <Guesses>
           Remaining Guesses: {guessDots}
       </Guesses>
@@ -205,6 +236,19 @@ function App() {
     </div>
   );
 }
+
+// const 
+
+
+const ColorBox = styled.div`
+  height: 40px;
+  width: 40px;
+  background-color: ${props => props.color};
+  margin: 0 5px 0 5px;
+  border-radius: 20%;
+  border: ${props => (props.selected ? "5px black solid" : "")};
+  display: inline-block;
+`;
 
 const ConnectInput = styled.div`
   font-weight: bold;

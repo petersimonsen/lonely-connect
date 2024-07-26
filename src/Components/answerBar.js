@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { colorVal } from './Utils';
 
 
 export const elStyle = {
@@ -12,13 +13,6 @@ export const elStyle = {
   alignItems: "center",
   borderRadius: "10px",
   fontSize: "18px"
-};
-
-const colorVal = {
-  "1": "#f5dd42",
-  "2": "#4fb86b",
-  "3": "#4287f5",
-  "4": "#946dd6",
 };
 
 //what did we learn?
