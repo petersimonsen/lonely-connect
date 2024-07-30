@@ -1,0 +1,92 @@
+{
+    "status": "OK",
+    "id": 437,
+    "print_date": "2024-07-30",
+    "editor": "Wyna Liu",
+    "categories": [
+        {
+            "title": "PEACHY KEEN",
+            "cards": [
+                {
+                    "content": "NEAT",
+                    "position": 10
+                },
+                {
+                    "content": "NIFTY",
+                    "position": 15
+                },
+                {
+                    "content": "SUPER",
+                    "position": 0
+                },
+                {
+                    "content": "SWELL",
+                    "position": 5
+                }
+            ]
+        },
+        {
+            "title": "PROVIDE MORE DETAILS",
+            "cards": [
+                {
+                    "content": "ELABORATE",
+                    "position": 4
+                },
+                {
+                    "content": "EXPAND",
+                    "position": 2
+                },
+                {
+                    "content": "EXPLAIN",
+                    "position": 11
+                },
+                {
+                    "content": "SPECIFY",
+                    "position": 14
+                }
+            ]
+        },
+        {
+            "title": "ABILITY TO DO SOMETHING WELL",
+            "cards": [
+                {
+                    "content": "FACILITY",
+                    "position": 3
+                },
+                {
+                    "content": "FLAIR",
+                    "position": 9
+                },
+                {
+                    "content": "GIFT",
+                    "position": 6
+                },
+                {
+                    "content": "KNACK",
+                    "position": 12
+                }
+            ]
+        },
+        {
+            "title": "GROUP OF BUILDINGS",
+            "cards": [
+                {
+                    "content": "BLOCK",
+                    "position": 7
+                },
+                {
+                    "content": "COMPLEX",
+                    "position": 1
+                },
+                {
+                    "content": "COMPOUND",
+                    "position": 8
+                },
+                {
+                    "content": "DEVELOPMENT",
+                    "position": 13
+                }
+            ]
+        }
+    ]
+}

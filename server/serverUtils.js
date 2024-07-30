@@ -1,7 +1,5 @@
-const solve =  require('./solve.json');
-const sortedSolve = solve.map((info) => {
-	return info["val"].sort();
-}).flat();
+const daily = require('./daily.json');
+
 
 const connectionsFromSubmittedVals = (submittedVals) => {
 	const sorted = submittedVals.sort();
@@ -17,6 +15,20 @@ const connectionsFromSubmittedVals = (submittedVals) => {
 	});
 	return connections;
 };
+
+const convertNYTSolutionSOLVE = (daily) => daily["categories"].map((cat, i) => {
+	return {
+		"desc": cat["title"],
+		"level": i,
+		"val": cat["cards"].map((card) => card["content"])
+	}
+});
+
+const solve = convertNYTSolutionSOLVE(daily);
+
+const sortedSolve = solve.map((info) => {
+	return info["val"].sort();
+}).flat();
 
 const serverUtils = {
 	connectionsFromSubmittedVals,
@@ -84,7 +96,23 @@ const serverUtils = {
 		const decentLengthMatch = input.length / desc.length > 0.5;
 		const contains = desc.trim().toLowerCase().includes(input.trim().toLowerCase());
 		return contains && decentLengthMatch;
-	}
+	},
+	
+	convertNYTSolutionBOARD: (daily) => {
+		const board = Array(16);
+		daily["categories"].forEach((cat) => {
+			cat["cards"].forEach((card) => {
+				const ind = Number(card["position"]);
+				const val = card["content"];
+				board[ind] = val;
+			})
+		})
+		console.log(board);
+		return board;
+	},
+
+	convertNYTSolutionSOLVE,
+
 }
 
 module.exports = serverUtils;

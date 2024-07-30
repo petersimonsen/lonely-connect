@@ -96,7 +96,7 @@ function App() {
             const { correct, answers: updatedAnswers } = data.data;
             if(!correct){
               alert("Incorrect Paint");
-              setGuesses(guesses - 1);
+              // setGuesses(guesses - 1);
               setLoading(false);
               return;
             }
@@ -267,9 +267,9 @@ function App() {
       {paintMode && <div>{Object.keys(colorVal).map((key) => {
         return <ColorBox selected={key === `${catColor}`} color={colorVal[key]} onClick={() => setCatColor(Number(key))} />
       })}</div>}
-      <Guesses>
+      {!paintMode && <Guesses>
           Remaining Guesses: {guessDots}
-      </Guesses>
+      </Guesses>}
       <div>
           <Button name="Shuffle" onSubmit={shuffleBoard}/>
           <Button name="Deselect" disabed={board.filter(el => el.selected).length === 0} onSubmit={deselectBoard}/>

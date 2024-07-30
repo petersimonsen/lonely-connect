@@ -4,6 +4,7 @@ const cors = require('cors');
 const path = require('path');
 const port = process.env.PORT || 8080;
 const board = require('./connect.json');
+const daily = require('./daily.json');
 const solve =  require('./solve.json');
 const { 
 	connectionsFromSubmittedVals, 
@@ -11,6 +12,8 @@ const {
 	matchDescription,
 	checkPaintConnections,
 	paintDescriptionsByCategory,
+	convertNYTSolutionBOARD,
+	convertNYTSolutionSOLVE,
 	 } = require('./serverUtils');
 
 
@@ -23,6 +26,7 @@ app.get('/', function(req, res) {
 });
 
 app.get('/board', (req, res) => {
+	const board = convertNYTSolutionBOARD(daily);
 	res.send(board);
 });
 
@@ -65,6 +69,7 @@ app.post('/paint', (req, res) => {
 app.post('/solve', (req, res) => {
 	const submittedAnswers = req.body.answers;
 	const answerNames = submittedAnswers.reduce((elements, el) => elements.concat(el.answers), []).map(el => el.name);
+	const solve = convertNYTSolutionSOLVE(daily);
     const otherSolves = solve.filter((el) => !el.val.some((name) => answerNames.indexOf(name) != -1));
     res.send(otherSolves);
 });
