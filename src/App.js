@@ -93,9 +93,10 @@ function App() {
         }
       })
         .then(data => {
-            const { correct, answers: updatedAnswers } = data.data;
+            const { correct, answers: updatedAnswers, oneAway } = data.data;
             if(!correct){
-              alert("Incorrect Paint");
+              const message = oneAway ? "Only Two Answers Wrong!" : "Incorrect Paint";
+              alert(message);
               // setGuesses(guesses - 1);
               setLoading(false);
               return;
@@ -219,7 +220,7 @@ function App() {
   // const instructions = `Find the four connections between each element.\n ${details}`;
   return (
     <div className="App">
-      <Title>Lonely Connect</Title>
+      <Title>Phoney Connect</Title>
       <SubTitle>
       <Instr>
         <InstrText>Connect each element into one of four categories.<br/>{details}</InstrText>
@@ -264,9 +265,9 @@ function App() {
           onSelect={onTapElement} />)}
       </div>
       {(hardMode || answers.length === 3) && <ConnectInput>{answers.length === 3 ? "Final " : ""} Connection: <input value={input} onInput={e => setInput(e.target.value)} /></ConnectInput>}
-      {paintMode && <div>{Object.keys(colorVal).map((key) => {
+      {paintMode && <PaintContainer>{Object.keys(colorVal).map((key) => {
         return <ColorBox selected={key === `${catColor}`} color={colorVal[key]} onClick={() => setCatColor(Number(key))} />
-      })}</div>}
+      })}</PaintContainer>}
       {!paintMode && <Guesses>
           Remaining Guesses: {guessDots}
       </Guesses>}
@@ -278,6 +279,10 @@ function App() {
     </div>
   );
 }
+
+const PaintContainer = styled.div`
+  margin-bottom: 10px;
+`;
 
 const InstrText = styled.h5`
   display: inline;

@@ -65,9 +65,12 @@ app.post('/paint', (req, res) => {
 		return res.status(400).send("Bad Request");
 	}
 
-	const correct = checkPaintConnections(submittedValues);
+	const { correct, oneAway } = checkPaintConnections(submittedValues);
 	if(!correct){
-		res.send({correct: false});
+		res.send({
+			correct: false,
+			oneAway
+		});
 		return;
 	}
 	const answers = paintDescriptionsByCategory(submittedValues);
