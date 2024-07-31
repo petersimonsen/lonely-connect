@@ -1,7 +1,20 @@
 const daily = require('./daily.json');
+// const cache = require('./cache');
 
+const convertNYTSolutionSOLVE = (solution) => solution["categories"].map((cat, i) => {
+	return {
+		"desc": cat["title"],
+		"level": i,
+		"val": cat["cards"].map((card) => card["content"])
+	}
+});
 
 const connectionsFromSubmittedVals = (submittedVals) => {
+	const solve = convertNYTSolutionSOLVE(daily);
+
+	const sortedSolve = solve.map((info) => {
+		return info["val"].sort();
+	}).flat();
 	const sorted = submittedVals.sort();
 	let connections = {};
 	sorted.forEach((val) => {
@@ -16,23 +29,8 @@ const connectionsFromSubmittedVals = (submittedVals) => {
 	return connections;
 };
 
-const convertNYTSolutionSOLVE = (daily) => daily["categories"].map((cat, i) => {
-	return {
-		"desc": cat["title"],
-		"level": i,
-		"val": cat["cards"].map((card) => card["content"])
-	}
-});
-
-const solve = convertNYTSolutionSOLVE(daily);
-
-const sortedSolve = solve.map((info) => {
-	return info["val"].sort();
-}).flat();
-
 const serverUtils = {
 	connectionsFromSubmittedVals,
-
 
 	respondToConnections: (connections) => {
 		const connectVals = Object.values(connections);
@@ -68,6 +66,7 @@ const serverUtils = {
 
 	paintDescriptionsByCategory: (elements) => {
 		//elements assumed to be correct
+		const solve = convertNYTSolutionSOLVE(daily);
 		const sortedElements = elements.sort((a, b) => {
 			return a["categoryLevel"] - b["categoryLevel"];
 		});
@@ -98,16 +97,15 @@ const serverUtils = {
 		return contains && decentLengthMatch;
 	},
 	
-	convertNYTSolutionBOARD: (daily) => {
+	convertNYTSolutionBOARD: (solution) => {
 		const board = Array(16);
-		daily["categories"].forEach((cat) => {
+		solution["categories"].forEach((cat) => {
 			cat["cards"].forEach((card) => {
 				const ind = Number(card["position"]);
 				const val = card["content"];
 				board[ind] = val;
 			})
 		})
-		console.log(board);
 		return board;
 	},
 

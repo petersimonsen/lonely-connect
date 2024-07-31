@@ -2,10 +2,12 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const path = require('path');
+const axios = require('axios');
 const port = process.env.PORT || 8080;
-const board = require('./connect.json');
+// const board = require('./connect.json');
+const fs = require('node:fs');
+// const solve =  require('./solve.json');
 const daily = require('./daily.json');
-const solve =  require('./solve.json');
 const { 
 	connectionsFromSubmittedVals, 
 	respondToConnections, 
@@ -14,19 +16,30 @@ const {
 	paintDescriptionsByCategory,
 	convertNYTSolutionBOARD,
 	convertNYTSolutionSOLVE,
-	 } = require('./serverUtils');
+} = require('./serverUtils');
+const { getPuzzle } = require('./nyt');
 
 
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../build')));
 
+const start = async function () {
+	const dailyPuzzel = await getPuzzle();
+	fs.writeFileSync('./daily.json', JSON.stringify(dailyPuzzel.data));
+}
+
+start();
+
+const getDaily = () => daily;
+
+
 app.get('/', function(req, res) {
 	res.sendFile(path.join(__dirname, '../build', 'index.html'));
 });
 
 app.get('/board', (req, res) => {
-	const board = convertNYTSolutionBOARD(daily);
+	const board = convertNYTSolutionBOARD(getDaily());
 	res.send(board);
 });
 
@@ -69,7 +82,7 @@ app.post('/paint', (req, res) => {
 app.post('/solve', (req, res) => {
 	const submittedAnswers = req.body.answers;
 	const answerNames = submittedAnswers.reduce((elements, el) => elements.concat(el.answers), []).map(el => el.name);
-	const solve = convertNYTSolutionSOLVE(daily);
+	const solve = convertNYTSolutionSOLVE(getDaily());
     const otherSolves = solve.filter((el) => !el.val.some((name) => answerNames.indexOf(name) != -1));
     res.send(otherSolves);
 });

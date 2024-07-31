@@ -41,7 +41,7 @@ function App() {
     if(guesses === 0){
         solvePuzzle();
     }
-  }, [guesses])
+  });
 
   const onTapElement = (i) => {
       const newBoard = [...board];
@@ -174,7 +174,7 @@ function App() {
           .then(data => {
             const solutions = data.data;
             const currAnswers = [...answers];
-            const answerElements = solutions.forEach((el) => {
+            solutions.forEach((el) => {
               const mappedAnswers = el["val"].map((name) => ({
                       name,
                       selected: false,
@@ -190,7 +190,7 @@ function App() {
           setAnswers(currAnswers);
             
       }).catch(() => {});
-        };
+  };
 
   const preventSubmit = () => {
       const hardModeIssues = ((hardMode || answers.length === 3) && input.length === 0);
