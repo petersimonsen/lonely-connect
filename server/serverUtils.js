@@ -32,6 +32,7 @@ const serverUtils = {
 	connectionsFromSubmittedVals,
 
 	respondToConnections: (connections) => {
+		const solve = convertNYTSolutionSOLVE(daily);
 		const connectVals = Object.values(connections);
 		
 		const correct = connectVals[0] === 4;
@@ -58,14 +59,16 @@ const serverUtils = {
 		},{});
 		const connectionsEach = Object.values(groupedEl).map((els) => connectionsFromSubmittedVals(els.map(el => el.name)));
 		let matchCounter = 0;
-		const matches = connectionsEach.forEach((connections) => {
+		let threeCounter = 0;
+		connectionsEach.forEach((connections) => {
 			connectVals = Object.values(connections);
 			if(connectVals[0] === 4) matchCounter++;
+			if(connectVals.some((val) => val === 3)) threeCounter++;
 		});
 
 		return {
-			correct: matchCounter === 16,
-			oneAway: matchCounter === 14
+			correct: matchCounter === 4,
+			oneAway: threeCounter === 2
 		};
 	},
 
