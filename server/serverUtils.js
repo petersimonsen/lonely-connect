@@ -1,5 +1,4 @@
 const daily = require('./daily.json');
-// const cache = require('./cache');
 
 const convertNYTSolutionSOLVE = (solution) => solution["categories"].map((cat, i) => {
 	return {
@@ -58,10 +57,16 @@ const serverUtils = {
 			return dict;
 		},{});
 		const connectionsEach = Object.values(groupedEl).map((els) => connectionsFromSubmittedVals(els.map(el => el.name)));
-		return connectionsEach.every((connections) => {
+		let matchCounter = 0;
+		const matches = connectionsEach.forEach((connections) => {
 			connectVals = Object.values(connections);
-			return connectVals[0] === 4;
+			if(connectVals[0] === 4) matchCounter++;
 		});
+
+		return {
+			correct: matchCounter === 16,
+			oneAway: matchCounter === 14
+		};
 	},
 
 	paintDescriptionsByCategory: (elements) => {
