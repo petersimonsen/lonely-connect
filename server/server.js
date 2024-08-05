@@ -4,9 +4,7 @@ const cors = require('cors');
 const path = require('path');
 const axios = require('axios');
 const port = process.env.PORT || 8080;
-// const board = require('./connect.json');
 const fs = require('node:fs');
-// const solve =  require('./solve.json');
 const daily = require('./daily.json');
 const { 
 	connectionsFromSubmittedVals, 
