@@ -3,6 +3,7 @@ const app = express();
 const cors = require('cors');
 const path = require('path');
 const axios = require('axios');
+const cron = require('node-cron');
 const port = process.env.PORT || 8080;
 const fs = require('node:fs');
 const daily = require('./daily.json');
@@ -23,14 +24,18 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '../build')));
 
 const start = async function () {
+	console.log("Generating Puzzle Request...");
 	const dailyPuzzel = await getPuzzle();
+	console.log("Puzzle Recieved, writing file...");
 	fs.writeFileSync('./server/daily.json', JSON.stringify(dailyPuzzel.data));
+	console.log("Puzzle File Written...");
 }
 
 start();
 
-const getDaily = () => daily;
+cron.schedule('0 3 * * *', start);
 
+const getDaily = () => daily;
 
 app.get('/', function(req, res) {
 	res.sendFile(path.join(__dirname, '../build', 'index.html'));
