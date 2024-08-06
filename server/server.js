@@ -24,7 +24,7 @@ app.use(express.static(path.join(__dirname, '../build')));
 
 const start = async function () {
 	const dailyPuzzel = await getPuzzle();
-	fs.writeFileSync('./daily.json', JSON.stringify(dailyPuzzel.data));
+	fs.writeFileSync('./server/daily.json', JSON.stringify(dailyPuzzel.data));
 }
 
 start();
