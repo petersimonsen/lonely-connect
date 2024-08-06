@@ -68,7 +68,7 @@ const serverUtils = {
 
 		return {
 			correct: matchCounter === 4,
-			oneAway: threeCounter === 2
+			oneAway: threeCounter === 2 && matchCounter === 2,
 		};
 	},
 

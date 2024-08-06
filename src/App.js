@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Element } from './Components/element';
 import Button from './Components/button';
 import AnswerBar from './Components/answerBar';
+import { Guesses } from './Components/guesses';
 import styled from 'styled-components';
 import { colorVal } from './Components/Utils';
 
@@ -15,11 +16,12 @@ function App() {
   const [board, setBoard] = useState(Array(16).fill({}));
   const [loading, setLoading] = useState(false);
   const [hardMode, setHardMode] = useState(false);
-  const [paintMode, setPaintMode] = useState(false);
+  const [paintMode, setPaintMode] = useState(true);
   const [guesses, setGuesses] = useState(4);
+  const [paints, setPaints] = useState(0);
   const [answers, setAnswers] = useState([]);
   const [input, setInput] = useState("");
-  const [catColor, setCatColor] = useState();
+  const [catColor, setCatColor] = useState(1);
 
   //make sure we know useeffect stuff
   useEffect(() => {   
@@ -97,11 +99,11 @@ function App() {
             if(!correct){
               const message = oneAway ? "Only Two Answers Wrong!" : "Incorrect Paint";
               alert(message);
-              // setGuesses(guesses - 1);
+              setPaints(paints + 1);
               setLoading(false);
               return;
             }
-            setAnswers(updatedAnswers);
+            setAnswers(updatedAnswers); 
             deselectBoard();
             setBoard([]);
 
@@ -206,12 +208,6 @@ function App() {
       }, {})).some((val) => val !== 4);
       return guesses <= 0 || loading || !maxSelected() || hardModeIssues || paintModeIssues;
   }
-
-  const guessDots = [];
-  for(let i = 0; i < guesses; i++){
-    guessDots.push(<Dot/>);
-  }
-
   
   let details = "You must describe the connection of the final category.";
   if(hardMode) details = "You must describe the connection for EACH category."
@@ -225,7 +221,7 @@ function App() {
       <Instr>
         <InstrText>Connect each element into one of four categories.<br/>{details}</InstrText>
       </Instr>
-      <div>
+      {/*<div>
       <HardMode>
         <input disabled={answers.length > 0} type="checkbox" value={hardMode} onInput={() => {
           setHardMode(!hardMode)
@@ -240,7 +236,7 @@ function App() {
           deselectBoard();
         }} /> Paint Mode
       </HardMode>
-      </div>
+      </div>*/}
       </SubTitle>
       <div style={{
         display: "grid",
@@ -268,9 +264,7 @@ function App() {
       {paintMode && <PaintContainer>{Object.keys(colorVal).map((key) => {
         return <ColorBox selected={key === `${catColor}`} color={colorVal[key]} onClick={() => setCatColor(Number(key))} />
       })}</PaintContainer>}
-      {!paintMode && <Guesses>
-          Remaining Guesses: {guessDots}
-      </Guesses>}
+      <Guesses paintMode={paintMode} guesses={(paintMode) ? paints : guesses} />
       <div>
           <Button name="Shuffle" onSubmit={shuffleBoard}/>
           <Button name="Deselect" disabed={board.filter(el => el.selected).length === 0} onSubmit={deselectBoard}/>
@@ -319,19 +313,19 @@ const ConnectInput = styled.div`
   margin: 10px 0 20px 0;
 `;
 
-const Guesses = styled.div`
-  margin: 10px 0 20px 0;
-`;
+// const Guesses = styled.div`
+//   margin: 10px 0 20px 0;
+// `;
 
-const Dot = styled.div`
-  height: 16px;
-  width: 16px;
-  background-color: #555555;
-  color: red;
-  margin: 0 5px 0 5px;
-  border-radius: 50%;
-  display: inline-block;
-`;
+// const Dot = styled.div`
+//   height: 16px;
+//   width: 16px;
+//   background-color: #555555;
+//   color: red;
+//   margin: 0 5px 0 5px;
+//   border-radius: 50%;
+//   display: inline-block;
+// `;
 
 const Title = styled.h1`
 `;
