@@ -1,4 +1,3 @@
-import './App.css';
 import {useState, useEffect} from 'react';
 import axios from 'axios';
 import { Element } from './Components/element';
@@ -10,13 +9,19 @@ import { colorVal } from './Components/Utils';
 
 const SERVER_URL = process.env.REACT_APP_HOST_URL;
 
-//what did we learn?
+/**
+ * optimize css for mobile
+ * move cname back to aws?
+ * get on subdomain?
+ * change colors?
+ * *
+ */
 function App() {
 
   const [board, setBoard] = useState(Array(16).fill({}));
   const [loading, setLoading] = useState(false);
-  const [hardMode, setHardMode] = useState(false);
-  const [paintMode, setPaintMode] = useState(true);
+  const [hardMode /*, setHardMode */] = useState(false);
+  const [paintMode /*, setPaintMode */] = useState(true);
   const [guesses, setGuesses] = useState(4);
   const [paints, setPaints] = useState(0);
   const [answers, setAnswers] = useState([]);
@@ -215,7 +220,7 @@ function App() {
 
   // const instructions = `Find the four connections between each element.\n ${details}`;
   return (
-    <div className="App">
+    <AppContainer>
       <Title>Phoney Connect</Title>
       <SubTitle>
       <Instr>
@@ -270,9 +275,13 @@ function App() {
           <Button name="Deselect" disabed={board.filter(el => el.selected).length === 0} onSubmit={deselectBoard}/>
           <Button name="Submit" disabled={preventSubmit()} onSubmit={onSubmit}/>
       </div>
-    </div>
+    </AppContainer>
   );
 }
+
+const AppContainer = styled.div`
+  text-align: center;
+`;
 
 const PaintContainer = styled.div`
   margin-bottom: 10px;
@@ -330,9 +339,9 @@ const ConnectInput = styled.div`
 const Title = styled.h1`
 `;
 
-const HardMode = styled.div`
-  justify-content: right;
-  display: flex;
-`;
+// const HardMode = styled.div`
+//   justify-content: right;
+//   display: flex;
+// `;
 
 export default App;
