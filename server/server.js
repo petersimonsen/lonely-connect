@@ -18,10 +18,16 @@ const {
 } = require('./serverUtils');
 const { getPuzzle } = require('./nyt');
 
+let currentPuzzel = daily;
 
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../build')));
+
+const getDaily = () => {
+	const rawData = fs.readFileSync('./server/daily.json');
+	return JSON.parse(rawData);
+}
 
 const start = async function () {
 	console.log("Generating Puzzle Request...");
@@ -29,20 +35,23 @@ const start = async function () {
 	console.log("Puzzle Recieved, writing file...");
 	fs.writeFileSync('./server/daily.json', JSON.stringify(dailyPuzzel.data));
 	console.log("Puzzle File Written...");
+	currentPuzzel = getDaily();
+	console.log("Updating Puzzel...");
+	console.log(currentPuzzel);
 }
 
 start();
 
 cron.schedule('0 3 * * *', start);
 
-const getDaily = () => daily;
+
 
 app.get('/', function(req, res) {
 	res.sendFile(path.join(__dirname, '../build', 'index.html'));
 });
 
 app.get('/board', (req, res) => {
-	const board = convertNYTSolutionBOARD(getDaily());
+	const board = convertNYTSolutionBOARD(currentPuzzel);
 	res.send(board);
 });
 
@@ -52,8 +61,8 @@ app.post('/connect', (req, res) => {
 		return res.status(400).send("Bad Request");
 	}
 
-	const connections = connectionsFromSubmittedVals(submittedValues);
-	const response = respondToConnections(connections);
+	const connections = connectionsFromSubmittedVals(submittedValues, currentPuzzel);
+	const response = respondToConnections(connections, currentPuzzel);
 	const description = req.body.description;
 	if(response["correct"] && description && description.length > 0 && !matchDescription(description, response["categoryDescription"])){
 		response["categoryDescription"] = "";
@@ -76,7 +85,7 @@ app.post('/paint', (req, res) => {
 		});
 		return;
 	}
-	const answers = paintDescriptionsByCategory(submittedValues);
+	const answers = paintDescriptionsByCategory(submittedValues, currentPuzzel);
 
 	res.send({
 		correct: true,
@@ -88,7 +97,7 @@ app.post('/paint', (req, res) => {
 app.post('/solve', (req, res) => {
 	const submittedAnswers = req.body.answers;
 	const answerNames = submittedAnswers.reduce((elements, el) => elements.concat(el.answers), []).map(el => el.name);
-	const solve = convertNYTSolutionSOLVE(getDaily());
+	const solve = convertNYTSolutionSOLVE(currentPuzzel);
     const otherSolves = solve.filter((el) => !el.val.some((name) => answerNames.indexOf(name) != -1));
     res.send(otherSolves);
 });

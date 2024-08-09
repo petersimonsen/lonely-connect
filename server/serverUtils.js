@@ -1,5 +1,3 @@
-const daily = require('./daily.json');
-
 const convertNYTSolutionSOLVE = (solution) => solution["categories"].map((cat, i) => {
 	return {
 		"desc": cat["title"],
@@ -8,8 +6,8 @@ const convertNYTSolutionSOLVE = (solution) => solution["categories"].map((cat, i
 	}
 });
 
-const connectionsFromSubmittedVals = (submittedVals) => {
-	const solve = convertNYTSolutionSOLVE(daily);
+const connectionsFromSubmittedVals = (submittedVals, puzzle) => {
+	const solve = convertNYTSolutionSOLVE(puzzle);
 
 	const sortedSolve = solve.map((info) => {
 		return info["val"].sort();
@@ -31,8 +29,8 @@ const connectionsFromSubmittedVals = (submittedVals) => {
 const serverUtils = {
 	connectionsFromSubmittedVals,
 
-	respondToConnections: (connections) => {
-		const solve = convertNYTSolutionSOLVE(daily);
+	respondToConnections: (connections, puzzle) => {
+		const solve = convertNYTSolutionSOLVE(puzzle);
 		const connectVals = Object.values(connections);
 		
 		const correct = connectVals[0] === 4;
@@ -72,9 +70,9 @@ const serverUtils = {
 		};
 	},
 
-	paintDescriptionsByCategory: (elements) => {
+	paintDescriptionsByCategory: (elements, puzzle) => {
 		//elements assumed to be correct
-		const solve = convertNYTSolutionSOLVE(daily);
+		const solve = convertNYTSolutionSOLVE(puzzle);
 		const sortedElements = elements.sort((a, b) => {
 			return a["categoryLevel"] - b["categoryLevel"];
 		});
