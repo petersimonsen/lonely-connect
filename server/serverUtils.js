@@ -45,7 +45,7 @@ const serverUtils = {
 		};
 	},
 
-	checkPaintConnections: (elements) => {
+	checkPaintConnections: (elements, puzzle) => {
 		const groupedEl = elements.reduce((dict, el) => {
 			if(!dict[el["categoryLevel"]]){
 				dict[el["categoryLevel"]] = [el];
@@ -55,7 +55,7 @@ const serverUtils = {
 			dict[el["categoryLevel"]].sort();
 			return dict;
 		},{});
-		const connectionsEach = Object.values(groupedEl).map((els) => connectionsFromSubmittedVals(els.map(el => el.name)));
+		const connectionsEach = Object.values(groupedEl).map((els) => connectionsFromSubmittedVals(els.map(el => el.name), puzzle));
 		let matchCounter = 0;
 		let threeCounter = 0;
 		connectionsEach.forEach((connections) => {

@@ -77,7 +77,7 @@ app.post('/paint', (req, res) => {
 		return res.status(400).send("Bad Request");
 	}
 
-	const { correct, oneAway } = checkPaintConnections(submittedValues);
+	const { correct, oneAway } = checkPaintConnections(submittedValues, currentPuzzel);
 	if(!correct){
 		res.send({
 			correct: false,
