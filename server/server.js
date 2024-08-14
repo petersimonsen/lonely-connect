@@ -36,15 +36,12 @@ const start = async function () {
 	fs.writeFileSync('./server/daily.json', JSON.stringify(dailyPuzzel.data));
 	console.log("Puzzle File Written...");
 	currentPuzzel = getDaily();
-	console.log("Updating Puzzel...");
-	console.log(currentPuzzel);
+	console.log("...Updated Puzzel");
 }
 
 start();
 
-cron.schedule('0 3 * * *', start);
-
-
+cron.schedule('0 6 * * *', start);
 
 app.get('/', function(req, res) {
 	res.sendFile(path.join(__dirname, '../build', 'index.html'));
