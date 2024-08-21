@@ -216,16 +216,21 @@ function App() {
   
   let details = "You must describe the connection of the final category.";
   if(hardMode) details = "You must describe the connection for EACH category."
-  if(paintMode) details = "You may only submit a valid 4x4 board. Categories may have any color.";
+  if(paintMode) details = "You may only submit a valid 4x4 board. Colors DO NOT correspond to difficulty.";
 
   // const instructions = `Find the four connections between each element.\n ${details}`;
   return (
     <AppContainer>
       <Title>Phoney Connect</Title>
       <SubTitle>
-      <Instr>
-        <InstrText>Connect each element into one of four categories.<br/>{details}</InstrText>
-      </Instr>
+      <SubT>Create Four Categories with Any Four Colors</SubT>
+      <Detail>
+          <InfoLink href="https://github.com/petersimonsen/lonely-connect" target="_blank">Github</InfoLink>
+          <DetailVisible>ⓘ</DetailVisible>
+          <DetailHidden>
+              {details}
+          </DetailHidden>  
+      </Detail>
       {/*<div>
       <HardMode>
         <input disabled={answers.length > 0} type="checkbox" value={hardMode} onInput={() => {
@@ -279,12 +284,44 @@ function App() {
   );
 }
 
+const SubT = styled.h5`
+  margin: 5px;
+`;
+const InfoLink = styled.a`
+  text-decoration: none;
+  color: #888888;
+`;
+
+const DetailVisible = styled.div`
+  display: inline;
+`;
+const DetailHidden = styled.div`
+  display: none;
+  z-index: 1;
+  color: #888888;
+  font-size: 12px;
+
+`;
+
+const Detail = styled.div`
+  display:flex;
+  flex-direction:row;
+  justify-content: space-between;
+  &:hover ${DetailVisible} {
+    display: none;
+  }
+  &:hover ${DetailHidden} {
+    display: inline
+  }
+`;
+
 const AppContainer = styled.div`
   text-align: center;
 `;
 
 const PaintContainer = styled.div`
   margin-bottom: 10px;
+  display:inline-block;
 `;
 
 const InstrText = styled.h5`
@@ -303,7 +340,8 @@ const Instr = styled.div`
 const SubTitle = styled.div`
   display: flex;
   font-weight: bold;
-  margin: 10px;
+  padding: 5px;
+  flex-direction:column;
   justify-content: space-around;
 `;
 
@@ -322,26 +360,8 @@ const ConnectInput = styled.div`
   margin: 10px 0 20px 0;
 `;
 
-// const Guesses = styled.div`
-//   margin: 10px 0 20px 0;
-// `;
-
-// const Dot = styled.div`
-//   height: 16px;
-//   width: 16px;
-//   background-color: #555555;
-//   color: red;
-//   margin: 0 5px 0 5px;
-//   border-radius: 50%;
-//   display: inline-block;
-// `;
-
-const Title = styled.h1`
+const Title = styled.h2`
+  margin-bottom: 0px;
 `;
-
-// const HardMode = styled.div`
-//   justify-content: right;
-//   display: flex;
-// `;
 
 export default App;
