@@ -232,11 +232,8 @@ function App() {
       <SubTitle>
       <SubT>Create Four Categories with Any Four Colors</SubT>
       <Detail>
-          <InfoLink href="https://github.com/petersimonsen/lonely-connect" rel="noreferrer" target="_blank">Github</InfoLink>
+          <InfoLink href="https://github.com/petersimonsen/lonely-connect" rel="noreferrer" target="_blank">Github➚</InfoLink>
           <DetailVisible onClick={toggleModal}>ⓘ</DetailVisible>
-          <DetailHidden>
-              {details}
-          </DetailHidden>  
       </Detail>
       {/*<div>
       <HardMode>
@@ -295,15 +292,18 @@ function App() {
 }
 
 const SubT = styled.h5`
-  margin: 5px;
+  padding: 10px 5px;
+  margin: 0px;
 `;
 const InfoLink = styled.a`
   text-decoration: none;
-  color: #888888;
+  color: #666666;
 `;
 
 const DetailVisible = styled.div`
   display: inline;
+  font-size: 20px;
+  padding-right: 10px;
 `;
 const DetailHidden = styled.div`
   display: none;
@@ -317,6 +317,7 @@ const Detail = styled.div`
   display:flex;
   flex-direction:row;
   justify-content: space-between;
+  padding: 5px 0 5px 0;
 `;
 
 const AppContainer = styled.div`
@@ -324,7 +325,7 @@ const AppContainer = styled.div`
 `;
 
 const PaintContainer = styled.div`
-  margin-bottom: 10px;
+  margin: 10px 0;
   display:inline-block;
 `;
 
