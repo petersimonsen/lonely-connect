@@ -6,6 +6,8 @@ import AnswerBar from './Components/answerBar';
 import { Guesses } from './Components/guesses';
 import styled from 'styled-components';
 import { colorVal } from './Components/Utils';
+import Modal from './modal/modal';
+import ModalContent from './modal/modalContent';
 
 const SERVER_URL = process.env.REACT_APP_HOST_URL;
 
@@ -27,6 +29,7 @@ function App() {
   const [answers, setAnswers] = useState([]);
   const [input, setInput] = useState("");
   const [catColor, setCatColor] = useState(1);
+  const [showModal, setShowModal] = useState(false);
 
   //make sure we know useeffect stuff
   useEffect(() => {   
@@ -200,6 +203,10 @@ function App() {
       }).catch(() => {});
   };
 
+  const toggleModal = () => {
+    setShowModal(!showModal);
+  }
+
   const preventSubmit = () => {
       const hardModeIssues = ((hardMode || answers.length === 3) && input.length === 0);
       const paintModeIssues = paintMode && Object.values(board.reduce((dict, el) => {
@@ -225,8 +232,8 @@ function App() {
       <SubTitle>
       <SubT>Create Four Categories with Any Four Colors</SubT>
       <Detail>
-          <InfoLink href="https://github.com/petersimonsen/lonely-connect" target="_blank">Github</InfoLink>
-          <DetailVisible>ⓘ</DetailVisible>
+          <InfoLink href="https://github.com/petersimonsen/lonely-connect" rel="noreferrer" target="_blank">Github</InfoLink>
+          <DetailVisible onClick={toggleModal}>ⓘ</DetailVisible>
           <DetailHidden>
               {details}
           </DetailHidden>  
@@ -280,6 +287,9 @@ function App() {
           <Button name="Deselect" disabed={board.filter(el => el.selected).length === 0} onSubmit={deselectBoard}/>
           <Button name="Submit" disabled={preventSubmit()} onSubmit={onSubmit}/>
       </div>
+      {
+        showModal && <Modal><ModalContent closeModal={toggleModal}/></Modal>
+      }
     </AppContainer>
   );
 }
@@ -307,12 +317,6 @@ const Detail = styled.div`
   display:flex;
   flex-direction:row;
   justify-content: space-between;
-  &:hover ${DetailVisible} {
-    display: none;
-  }
-  &:hover ${DetailHidden} {
-    display: inline
-  }
 `;
 
 const AppContainer = styled.div`
@@ -322,19 +326,6 @@ const AppContainer = styled.div`
 const PaintContainer = styled.div`
   margin-bottom: 10px;
   display:inline-block;
-`;
-
-const InstrText = styled.h5`
-  display: inline;
-`;
-
-const Instr = styled.div`
-  width: 70%;
-  text-align: left;
-  color: #888888;
-  border: 1px solid #888888;
-  padding: 5px;
-  border-radius: 10px;
 `;
 
 const SubTitle = styled.div`
