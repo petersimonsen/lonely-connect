@@ -1,7 +1,7 @@
 const Button = ({name, onSubmit, disabled}) => {
     const elStyle = {
       padding: "10px",
-      margin: "0 10px 0 10px",
+      margin: "0 8px",
       backgroundColor: "white",
       fontWeight: "bold",
       borderRadius: "30px",

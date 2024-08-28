@@ -88,6 +88,15 @@ function App() {
       setBoard(newBoard);
   }
 
+  const sortBoard = () => {
+      const newBoard = [...board].sort((a, b) => {
+          if(a.categoryLevel === 0) return 1;
+          if(b.categoryLevel === 0) return -1;
+          return a.categoryLevel - b.categoryLevel;
+      });
+      setBoard(newBoard);
+  };
+
   const reconfigureBoard = (answerElements) => {
       const currentAnswerNames = answers.reduce((elements, el) => elements.concat(el.answers), []).concat(answerElements).map(el => el.name);
       const unAnsweredBoard = board.filter((el) => currentAnswerNames.indexOf(el.name) === -1);
@@ -280,8 +289,9 @@ function App() {
       })}</PaintContainer>}
       <Guesses paintMode={paintMode} guesses={(paintMode) ? paints : guesses} />
       <div>
+          <Button name="Sort" onSubmit={sortBoard}/>
           <Button name="Shuffle" onSubmit={shuffleBoard}/>
-          <Button name="Deselect" disabed={board.filter(el => el.selected).length === 0} onSubmit={deselectBoard}/>
+          <Button name="Clear" disabed={board.filter(el => el.selected).length === 0} onSubmit={deselectBoard}/>
           <Button name="Submit" disabled={preventSubmit()} onSubmit={onSubmit}/>
       </div>
       {
