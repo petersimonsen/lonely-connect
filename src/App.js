@@ -8,6 +8,7 @@ import styled from 'styled-components';
 import { colorVal } from './Components/Utils';
 import Modal from './modal/modal';
 import ModalContent from './modal/modalContent';
+import useLocalStorage from './storage';
 
 const SERVER_URL = process.env.REACT_APP_HOST_URL;
 
@@ -20,13 +21,13 @@ const SERVER_URL = process.env.REACT_APP_HOST_URL;
  */
 function App() {
 
-  const [board, setBoard] = useState(Array(16).fill({}));
+  const [board, setBoard] = useLocalStorage("board", Array(16).fill({}));
   const [loading, setLoading] = useState(false);
   const [hardMode /*, setHardMode */] = useState(false);
   const [paintMode /*, setPaintMode */] = useState(true);
   const [guesses, setGuesses] = useState(4);
-  const [paints, setPaints] = useState(0);
-  const [answers, setAnswers] = useState([]);
+  const [paints, setPaints] = useLocalStorage("paints", 0);
+  const [answers, setAnswers] = useLocalStorage("answers", []);
   const [input, setInput] = useState("");
   const [catColor, setCatColor] = useState(1);
   const [showModal, setShowModal] = useState(false);
@@ -35,17 +36,22 @@ function App() {
   useEffect(() => {   
       axios.get(`${SERVER_URL}/board`)
       .then(data => {
-        setBoard(data.data.flat().map((name) => ({
-          name,
-          selectable: true,
-          categoryLevel: 0,
-          selected: false
-        })));
-        setAnswers([]);
+        const names = data.data.flat();
+        const boardOld = board.every((el) => {
+          return names.includes(el.name);
+        });
+        if(!boardOld){
+          setBoard(data.data.flat().map((name) => ({
+            name,
+            selectable: true,
+            categoryLevel: 0,
+            selected: false
+            })));
+          setAnswers([]);  
+        }
       })
       .catch(err => console.log(err));
-      
-  }, [setBoard, setAnswers, paintMode]); 
+  }, [setBoard, setAnswers, paintMode]);
 
   useEffect(() => {
     if(guesses === 0){
@@ -230,11 +236,6 @@ function App() {
       return guesses <= 0 || loading || !maxSelected() || hardModeIssues || paintModeIssues;
   }
   
-  let details = "You must describe the connection of the final category.";
-  if(hardMode) details = "You must describe the connection for EACH category."
-  if(paintMode) details = "You may only submit a valid 4x4 board. Colors DO NOT correspond to difficulty.";
-
-  // const instructions = `Find the four connections between each element.\n ${details}`;
   return (
     <AppContainer>
       <Title>Phoney Connect</Title>
@@ -314,13 +315,6 @@ const DetailVisible = styled.div`
   display: inline;
   font-size: 20px;
   padding-right: 10px;
-`;
-const DetailHidden = styled.div`
-  display: none;
-  z-index: 1;
-  color: #888888;
-  font-size: 12px;
-
 `;
 
 const Detail = styled.div`
