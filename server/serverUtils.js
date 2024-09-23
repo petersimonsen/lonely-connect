@@ -112,7 +112,10 @@ const serverUtils = {
 				board[ind] = val;
 			})
 		})
-		return board;
+		return {
+			startBoard: board,
+			date: solution["print_date"],
+		};
 	},
 
 	convertNYTSolutionSOLVE,

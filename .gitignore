@@ -25,4 +25,4 @@ yarn-error.log*
 .amplify-hosting
 CodeDeploy*
 *plan.txt*
-server/daily.json
+/server/daily.json

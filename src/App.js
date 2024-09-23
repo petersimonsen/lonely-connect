@@ -28,6 +28,7 @@ function App() {
   const [guesses, setGuesses] = useState(4);
   const [paints, setPaints] = useLocalStorage("paints", 0);
   const [answers, setAnswers] = useLocalStorage("answers", []);
+  const [puzzleDate, setPuzzleDate] = useLocalStorage("puzzleDate", "");
   const [input, setInput] = useState("");
   const [catColor, setCatColor] = useState(1);
   const [showModal, setShowModal] = useState(false);
@@ -36,18 +37,24 @@ function App() {
   useEffect(() => {   
       axios.get(`${SERVER_URL}/board`)
       .then(data => {
-        const names = data.data.flat();
-        const boardOld = board.every((el) => {
-          return names.includes(el.name);
-        });
-        if(!boardOld){
-          setBoard(data.data.flat().map((name) => ({
+        const { startBoard, date } = data.data;
+        const emptyBoard = board.length === 0 && answers.length === 0;
+        if(
+          emptyBoard ||
+          puzzleDate.length === 0 ||
+          puzzleDate != date
+        ){
+          setBoard(startBoard.map((name) => ({
             name,
             selectable: true,
             categoryLevel: 0,
             selected: false
             })));
-          setAnswers([]);  
+          setAnswers([]);
+          setPaints(0);
+          setPuzzleDate(date);
+        } else if (puzzleDate != date) {
+          setPuzzleDate(date);
         }
       })
       .catch(err => console.log(err));
