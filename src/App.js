@@ -27,6 +27,7 @@ function App() {
   const [paintMode /*, setPaintMode */] = useState(true);
   const [guesses, setGuesses] = useState(4);
   const [paints, setPaints] = useLocalStorage("paints", 0);
+  const [submissions, setSubmissions] = useLocalStorage("submitted", []);
   const [answers, setAnswers] = useLocalStorage("answers", []);
   const [puzzleDate, setPuzzleDate] = useLocalStorage("puzzleDate", "");
   const [input, setInput] = useState("");
@@ -42,7 +43,7 @@ function App() {
         if(
           emptyBoard ||
           puzzleDate.length === 0 ||
-          puzzleDate != date
+          puzzleDate !== date
         ){
           setBoard(startBoard.map((name) => ({
             name,
@@ -52,8 +53,9 @@ function App() {
             })));
           setAnswers([]);
           setPaints(0);
+          setSubmissions([]);
           setPuzzleDate(date);
-        } else if (puzzleDate != date) {
+        } else if (puzzleDate !== date) {
           setPuzzleDate(date);
         }
       })
@@ -102,12 +104,16 @@ function App() {
   }
 
   const sortBoard = () => {
-      const newBoard = [...board].sort((a, b) => {
+      setBoard(sortBoardByCategory(board));
+  };
+
+  const sortBoardByCategory = (currentBoard) => {
+      const newBoard = [...currentBoard].sort((a, b) => {
           if(a.categoryLevel === 0) return 1;
           if(b.categoryLevel === 0) return -1;
           return a.categoryLevel - b.categoryLevel;
       });
-      setBoard(newBoard);
+      return newBoard;
   };
 
   const reconfigureBoard = (answerElements) => {
@@ -128,6 +134,7 @@ function App() {
             const { correct, answers: updatedAnswers, oneAway } = data.data;
             if(!correct){
               const message = oneAway ? "Only Two Answers Wrong!" : "Incorrect Paint";
+              addBoardToSubmissions();
               alert(message);
               setPaints(paints + 1);
               setLoading(false);
@@ -144,10 +151,30 @@ function App() {
       ;
   }
 
+  const addBoardToSubmissions = () => {
+      const sortedB = sortBoardByCategory(board);
+      setSubmissions([...submissions, sortedB]);
+  }
+
+  const checkSubmissions = () => {
+      const sortedB = sortBoardByCategory(board);
+      return submissions.every((submittedBoard) => {
+          return submittedBoard.some((el, i) => {
+              const currentEl = sortedB[i];
+              return el.name !== currentEl.name || el.categoryLevel !== currentEl.categoryLevel
+          })
+      });
+  };
+
   const onSubmit = () => {
     setLoading(true);
     const elements = board.filter(el => el.selected);
     if(elements.length !== requiredSelection()) return;
+    if(!checkSubmissions()){
+      setLoading(false);
+      alert('Already Submitted!');
+      return;
+    }
     if(paintMode) return submitPaint();
     //const response = await connectValues(values);
     axios.post(`${SERVER_URL}/connect`, {
