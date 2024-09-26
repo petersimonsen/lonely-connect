@@ -32,7 +32,7 @@
     {
       "name": "default",
       "runtime": "nodejs18.x",
-      "entrypoint": "index.js"
+      "entrypoint": "index.tsx"
     }
   ]
 }

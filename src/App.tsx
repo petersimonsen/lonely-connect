@@ -1,14 +1,14 @@
 import {useState, useEffect} from 'react';
 import axios from 'axios';
-import { Element } from './Components/element';
-import Button from './Components/button';
-import AnswerBar from './Components/answerBar';
-import { Guesses } from './Components/guesses';
+import { Element } from './Components/element.tsx';
+import Button from './Components/button.tsx';
+import AnswerBar from './Components/answerBar.tsx';
+import { Guesses } from './Components/guesses.tsx';
 import styled from 'styled-components';
-import { colorVal } from './Components/Utils';
+import { colorVal } from './Components/Utils.ts';
 import Modal from './modal/modal';
 import ModalContent from './modal/modalContent';
-import useLocalStorage from './storage';
+import useLocalStorage from './storage.ts';
 
 const SERVER_URL = process.env.REACT_APP_HOST_URL;
 
