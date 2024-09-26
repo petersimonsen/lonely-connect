@@ -1,6 +1,7 @@
-import { colorVal } from './Utils';
+import colorVal from './Utils';
 import styled from 'styled-components';
 import { useMediaQuery } from 'react-responsive'
+import { WordElement } from '../data/element';
 
 
 const mobile = {
@@ -13,9 +14,15 @@ const desktop = {
   fontSize: "18px"
 }
 
+export type ElementProps = WordElement & {
+  index: number;
+  key: number;
+  onSelect: (index: number) => void;
+};
+
 const useMobile = () => useMediaQuery({maxWidth: 400});
 
-export const Element = (props) => {
+export const Element = (props: ElementProps) => {
     return <ElBox  
       categoryLevel={props.categoryLevel}
       selectable={props.selectable}
@@ -27,7 +34,17 @@ export const Element = (props) => {
     }>{props.name}</ElBox>;
 };
 
-const ElBox = styled.div`
+type ElementBoxProps = {
+  categoryLevel: number;
+  selected: boolean;
+  selectable: boolean;
+  key: number;
+  onClick: () => void;
+  mobileScreen: boolean;
+  children: React.ReactNode;
+}
+
+const ElBox = styled.div<ElementBoxProps>`
   margin: 3px;
   padding: 17px;
   font-weight: bold;

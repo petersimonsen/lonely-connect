@@ -1,34 +1,29 @@
 import {useState, useEffect} from 'react';
 import axios from 'axios';
-import { Element } from './Components/element.tsx';
-import Button from './Components/button.tsx';
-import AnswerBar from './Components/answerBar.tsx';
-import { Guesses } from './Components/guesses.tsx';
 import styled from 'styled-components';
-import { colorVal } from './Components/Utils.ts';
+import { Element } from './Components/element';
+import Button from './Components/button';
+import AnswerBar from './Components/answerBar';
+import { Guesses } from './Components/guesses';
+import colorVal from './Components/Utils';
 import Modal from './modal/modal';
 import ModalContent from './modal/modalContent';
-import useLocalStorage from './storage.ts';
+import useLocalStorage from './storage';
+import { WordElement, AnswerElement, SolvedElement } from './data/element';
 
 const SERVER_URL = process.env.REACT_APP_HOST_URL;
 
-/**
- * optimize css for mobile
- * move cname back to aws?
- * get on subdomain?
- * change colors?
- * *
- */
+
 function App() {
 
-  const [board, setBoard] = useLocalStorage("board", Array(16).fill({}));
+  const [board, setBoard] = useLocalStorage<WordElement[]>("board", Array(16).fill({}));
   const [loading, setLoading] = useState(false);
   const [hardMode /*, setHardMode */] = useState(false);
   const [paintMode /*, setPaintMode */] = useState(true);
   const [guesses, setGuesses] = useState(4);
   const [paints, setPaints] = useLocalStorage("paints", 0);
-  const [submissions, setSubmissions] = useLocalStorage("submitted", []);
-  const [answers, setAnswers] = useLocalStorage("answers", []);
+  const [submissions, setSubmissions] = useLocalStorage<Array<WordElement[]>>("submitted", []);
+  const [answers, setAnswers] = useLocalStorage<AnswerElement[]>("answers", []);
   const [puzzleDate, setPuzzleDate] = useLocalStorage("puzzleDate", "");
   const [input, setInput] = useState("");
   const [catColor, setCatColor] = useState(1);
@@ -36,7 +31,10 @@ function App() {
 
   //make sure we know useeffect stuff
   useEffect(() => {   
-      axios.get(`${SERVER_URL}/board`)
+      axios.get<{
+        startBoard: string[],
+        date: string;
+      }>(`${SERVER_URL}/board`)
       .then(data => {
         const { startBoard, date } = data.data;
         const emptyBoard = board.length === 0 && answers.length === 0;
@@ -68,7 +66,7 @@ function App() {
     }
   });
 
-  const onTapElement = (i) => {
+  const onTapElement = (i: number) => {
       const newBoard = [...board];
       newBoard[i].selected = !newBoard[i].selected;
       if(paintMode && catColor && catColor > 0){
@@ -107,7 +105,7 @@ function App() {
       setBoard(sortBoardByCategory(board));
   };
 
-  const sortBoardByCategory = (currentBoard) => {
+  const sortBoardByCategory = (currentBoard: WordElement[]) => {
       const newBoard = [...currentBoard].sort((a, b) => {
           if(a.categoryLevel === 0) return 1;
           if(b.categoryLevel === 0) return -1;
@@ -116,9 +114,9 @@ function App() {
       return newBoard;
   };
 
-  const reconfigureBoard = (answerElements) => {
-      const currentAnswerNames = answers.reduce((elements, el) => elements.concat(el.answers), []).concat(answerElements).map(el => el.name);
-      const unAnsweredBoard = board.filter((el) => currentAnswerNames.indexOf(el.name) === -1);
+  const reconfigureBoard = (answerElements: WordElement[]) => {
+      const currentAnswerNames = answers.reduce((elements: WordElement[], el) => elements.concat(el.answers), []).concat(answerElements).map(el => el.name);
+      const unAnsweredBoard = board.filter((el: WordElement) => currentAnswerNames.indexOf(el.name) === -1);
       setBoard(unAnsweredBoard);
   };
 
@@ -224,7 +222,7 @@ function App() {
   }
 
   const solvePuzzle = () => {
-      axios.post(`${SERVER_URL}/solve`, {
+      axios.post<SolvedElement[]>(`${SERVER_URL}/solve`, {
         answers
       },{
           headers: {
@@ -258,7 +256,7 @@ function App() {
 
   const preventSubmit = () => {
       const hardModeIssues = ((hardMode || answers.length === 3) && input.length === 0);
-      const paintModeIssues = paintMode && Object.values(board.reduce((dict, el) => {
+      const paintModeIssues = paintMode && Object.values(board.reduce((dict: { [key: string]: number }, el) => {
         const catLevelCount = el["categoryLevel"];
         if(dict[`${catLevelCount}`]){
           dict[`${catLevelCount}`] = dict[`${catLevelCount}`] + 1;
@@ -318,7 +316,7 @@ function App() {
           key={i} 
           onSelect={onTapElement} />)}
       </div>
-      {(hardMode || answers.length === 3) && <ConnectInput>{answers.length === 3 ? "Final " : ""} Connection: <input value={input} onInput={e => setInput(e.target.value)} /></ConnectInput>}
+      {(hardMode || answers.length === 3) && <ConnectInput>{answers.length === 3 ? "Final " : ""} Connection: <input value={input} onInput={e => setInput((e.target as HTMLTextAreaElement).value)} /></ConnectInput>}
       {paintMode && <PaintContainer>{Object.keys(colorVal).map((key) => {
         return <ColorBox selected={key === `${catColor}`} color={colorVal[key]} onClick={() => setCatColor(Number(key))} />
       })}</PaintContainer>}
@@ -326,7 +324,7 @@ function App() {
       <div>
           <Button name="Sort" onSubmit={sortBoard}/>
           <Button name="Shuffle" onSubmit={shuffleBoard}/>
-          <Button name="Clear" disabed={board.filter(el => el.selected).length === 0} onSubmit={deselectBoard}/>
+          <Button name="Clear" disabled={board.filter(el => el.selected).length === 0} onSubmit={deselectBoard}/>
           <Button name="Submit" disabled={preventSubmit()} onSubmit={onSubmit}/>
       </div>
       {
@@ -375,7 +373,10 @@ const SubTitle = styled.div`
   justify-content: space-around;
 `;
 
-const ColorBox = styled.div`
+const ColorBox = styled.div<{ 
+  color: string;
+  selected: boolean;
+}>`
   height: 40px;
   width: 40px;
   background-color: ${props => props.color};

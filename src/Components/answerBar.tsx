@@ -1,34 +1,37 @@
 import styled from 'styled-components';
-import { colorVal } from './Utils';
+import colorVal from './Utils';
+import { WordElement } from '../data/element';
 
-
-export const elStyle = {
-  margin: "10px",
-  padding: "10px",
-  fontWeight: "bold",
-  display: "flex",
-  height: "100px",
-  justifyContent: "center",
-  flexDirection: "column",
-  alignItems: "center",
-  borderRadius: "10px",
-  fontSize: "18px"
+type AnswerBarProps = {
+  elements: WordElement[];
+  categoryLevel: number;
+  index: number;
+  description: string;
 };
 
-//what did we learn?
-const AnswerBar = ({elements, categoryLevel, index, description}) => {
-    const answerStyle = {
-      ...elStyle,
-      backgroundColor: colorVal[categoryLevel + ""]
-    };
-    return <div style={answerStyle}>
+const AnswerBar = ({elements, categoryLevel, index, description}: AnswerBarProps) => {
+    return <AnswerBarComponent categoryLevel={categoryLevel}>
           <h3>
             {description}
             </h3>
           <Names>
             {elements.map(el => el.name).join(", ")}</Names>
-        </div>;
+        </AnswerBarComponent>;
 };
+
+const AnswerBarComponent = styled.div<{ categoryLevel: number}>`
+  margin: 10px;
+  padding: 10px;
+  font-weight: bold;
+  display: flex;
+  height: 100px;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 10px;
+  font-size: 18px;
+  background-color: ${props => colorVal[props.categoryLevel + ""]}
+`;
 
 const Names = styled.div`
   font-weight: normal;

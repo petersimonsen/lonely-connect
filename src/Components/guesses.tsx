@@ -1,6 +1,11 @@
 import styled from 'styled-components';
 
-export const Guesses = ({ guesses, paintMode }) => {
+export type GuessProps = {
+    guesses: number;
+    paintMode: boolean;
+}
+
+export const Guesses = ({ guesses, paintMode }: GuessProps) => {
     const guessDots = [];
     for(let i = 0; i < guesses; i++){
       guessDots.push(<Dot key={i}/>);

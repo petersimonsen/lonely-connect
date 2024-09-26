@@ -1,4 +1,10 @@
-const Button = ({name, onSubmit, disabled}) => {
+type ButtonProps = {
+    name: string;
+    onSubmit: () => void;
+    disabled?: boolean;
+};  
+
+const Button = ({name, onSubmit, disabled}: ButtonProps) => {
     const elStyle = {
       padding: "10px",
       margin: "0 8px",
