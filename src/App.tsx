@@ -58,13 +58,13 @@ function App() {
         }
       })
       .catch(err => console.log(err));
-  }, [setBoard, setAnswers, paintMode]);
+  }, [paintMode]);
 
   useEffect(() => {
     if(guesses === 0){
         solvePuzzle();
     }
-  });
+  }, [guesses]);
 
   const onTapElement = (i: number) => {
       const newBoard = [...board];
@@ -121,7 +121,11 @@ function App() {
   };
 
   const submitPaint = () => {
-      axios.post(`${SERVER_URL}/paint`, {
+      axios.post<{
+        correct: boolean;
+        oneAway?: boolean;
+        answers?: AnswerElement[];
+      }>(`${SERVER_URL}/paint`, {
           values: board,
       }, {
         headers: {
@@ -138,7 +142,7 @@ function App() {
               setLoading(false);
               return;
             }
-            setAnswers(updatedAnswers); 
+            setAnswers(updatedAnswers || []); 
             deselectBoard();
             setBoard([]);
 

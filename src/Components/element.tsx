@@ -34,10 +34,7 @@ export const Element = (props: ElementProps) => {
     }>{props.name}</ElBox>;
 };
 
-type ElementBoxProps = {
-  categoryLevel: number;
-  selected: boolean;
-  selectable: boolean;
+type ElementBoxProps = Omit<WordElement, "name"> & {
   key: number;
   onClick: () => void;
   mobileScreen: boolean;
