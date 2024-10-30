@@ -2,11 +2,9 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const path = require('path');
-const axios = require('axios');
 const cron = require('node-cron');
 const port = process.env.PORT || 8080;
 const fs = require('node:fs');
-const daily = require('./daily.json');
 const { 
 	connectionsFromSubmittedVals, 
 	respondToConnections, 
@@ -18,14 +16,11 @@ const {
 } = require('./serverUtils');
 const { getPuzzle } = require('./nyt');
 
-let currentPuzzel = daily;
-
-app.use(cors());
-app.use(express.json());
-app.use(express.static(path.join(__dirname, '../build')));
+const puzzlePath = path.join(__dirname, '/puzzles');
+const DAILY_PATH = `${puzzlePath}/daily.json`;
 
 const getDaily = () => {
-	const rawData = fs.readFileSync('./server/daily.json');
+	const rawData = fs.readFileSync(DAILY_PATH);
 	return JSON.parse(rawData);
 }
 
@@ -33,11 +28,17 @@ const start = async function () {
 	console.log("Generating Puzzle Request...");
 	const dailyPuzzel = await getPuzzle();
 	console.log("Puzzle Recieved, writing file...");
-	fs.writeFileSync('./server/daily.json', JSON.stringify(dailyPuzzel.data));
+	fs.writeFileSync(DAILY_PATH, JSON.stringify(dailyPuzzel.data));
 	console.log("Puzzle File Written...");
 	currentPuzzel = getDaily();
 	console.log("...Updated Puzzel");
 }
+
+let currentPuzzel = null;
+
+app.use(cors());
+app.use(express.json());
+app.use(express.static(path.join(__dirname, '../build')));
 
 start();
 
