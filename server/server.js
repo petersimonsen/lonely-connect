@@ -18,28 +18,30 @@ const {
 } = require('./serverUtils');
 const { getPuzzle } = require('./nyt');
 
+const PUZZLE_FILE_PATH = './server/puzzles/';
+
 let currentPuzzel = daily;
 
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../build')));
 
-const getDaily = () => {
-	const rawData = fs.readFileSync('./server/daily.json');
+const getPuzzleFile = (fileString) => {
+	const rawData = fs.readFileSync(`${PUZZLE_FILE_PATH}${fileName}.json`);
 	return JSON.parse(rawData);
 }
 
-const start = async function () {
+const requestPuzzleForDay = (day = moment()) => {
 	console.log("Generating Puzzle Request...");
-	const dailyPuzzel = await getPuzzle();
-	console.log("Puzzle Recieved, writing file...");
-	fs.writeFileSync('./server/daily.json', JSON.stringify(dailyPuzzel.data));
+	const dailyPuzzel = await getPuzzle(day);
+	const fileName = dailyPuzzel["print_date"];
+	fs.writeFileSync(`${PUZZLE_FILE_PATH}${fileName}.json`, JSON.stringify(dailyPuzzel.data));
 	console.log("Puzzle File Written...");
-	currentPuzzel = getDaily();
+	currentPuzzel = getPuzzleFile(fileName);
 	console.log("...Updated Puzzel");
 }
 
-start();
+requestPuzzleForDay();
 
 cron.schedule('0 6 * * *', start);
 
@@ -48,6 +50,8 @@ app.get('/', function(req, res) {
 });
 
 app.get('/board', (req, res) => {
+	const date = req.params.date;
+	
 	const board = convertNYTSolutionBOARD(currentPuzzel);
 	res.send(board);
 });
