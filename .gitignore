@@ -11,6 +11,13 @@
 # production
 /build
 
+# deploy
+/deploy
+
+# puzzel files
+
+/server/puzzles
+
 # misc
 .DS_Store
 .env
