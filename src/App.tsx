@@ -9,12 +9,14 @@ import colorVal from './Components/Utils';
 import Modal from './modal/modal';
 import ModalContent from './modal/modalContent';
 import useLocalStorage from './storage';
+import moment from 'moment';
 import { WordElement, AnswerElement, SolvedElement } from './data/element';
 
 const SERVER_URL = process.env.REACT_APP_HOST_URL;
 
 
 function App() {
+  const formatDate = (date: moment.Moment): string => moment(date).format("YYYY-MM-DD");
 
   const [board, setBoard] = useLocalStorage<WordElement[]>("board", Array(16).fill({}));
   const [loading, setLoading] = useState(false);
@@ -28,13 +30,18 @@ function App() {
   const [input, setInput] = useState("");
   const [catColor, setCatColor] = useState(1);
   const [showModal, setShowModal] = useState(false);
+  const [reqPuzzleDate, setReqPuzzleDate] = useState(formatDate(moment()));
+
+  /**
+   * arrows change req puzzel date
+   */
 
   //make sure we know useeffect stuff
   useEffect(() => {   
       axios.get<{
         startBoard: string[],
         date: string;
-      }>(`${SERVER_URL}/board`)
+      }>(`${SERVER_URL}/board?date=${reqPuzzleDate}`)
       .then(data => {
         const { startBoard, date } = data.data;
         const emptyBoard = board.length === 0 && answers.length === 0;
