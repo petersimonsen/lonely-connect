@@ -1,5 +1,4 @@
 import {useState, useEffect} from 'react';
-import axios from 'axios';
 import styled from 'styled-components';
 import { Element } from './Components/element';
 import Button from './Components/button';
@@ -10,7 +9,9 @@ import Modal from './modal/modal';
 import ModalContent from './modal/modalContent';
 import useLocalStorage from './storage';
 import moment from 'moment';
+import axios from 'axios';
 import { WordElement, AnswerElement, SolvedElement, PuzzelSol } from './data/element';
+
 
 const SERVER_URL = process.env.REACT_APP_HOST_URL;
 
@@ -345,8 +346,8 @@ function App() {
           onSelect={onTapElement} />)}
       </div>
       {(hardMode || answers.length === 3) && <ConnectInput>{answers.length === 3 ? "Final " : ""} Connection: <input value={input} onInput={e => setInput((e.target as HTMLTextAreaElement).value)} /></ConnectInput>}
-      {paintMode && <PaintContainer>{Object.keys(colorVal).map((key) => {
-        return <ColorBox selected={key === `${catColor}`} color={colorVal[key]} onClick={() => setCatColor(Number(key))} />
+      {paintMode && <PaintContainer>{Object.keys(colorVal).map((key, i) => {
+        return <ColorBox selected={key === `${catColor}`} color={colorVal[key]} onClick={() => setCatColor(Number(key))} key={`${colorVal[key]}-${i}`} />
       })}</PaintContainer>}
       <Guesses paintMode={paintMode} guesses={solvedDates[reqPuzzleDate] ? solvedDates[reqPuzzleDate].g : 0} />
       <div>
