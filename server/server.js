@@ -29,7 +29,7 @@ const getPuzzleFile = (fileName) => {
 
 const requestPuzzleForDay = async (day = moment()) => {
 	try {
-		console.log("Generating Puzzle Request...");
+		console.log(`Requesting Puzzel ${day}...`);
 		const dailyPuzzel = await getPuzzle(day);
 		const fileName = dailyPuzzel.data["print_date"];
 		console.log("Puzzle Recieved, writing file...");
@@ -49,9 +49,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../build')));
 
-requestPuzzleForDay();
+requestPuzzleForDay(moment());
 
-cron.schedule('0 6 * * *', requestPuzzleForDay);
+cron.schedule('0 6 * * *', async () => requestPuzzleForDay(moment()));
 
 app.get('/', function(req, res) {
 	res.sendFile(path.join(__dirname, '../build', 'index.html'));
