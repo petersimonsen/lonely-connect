@@ -10,7 +10,7 @@ import Modal from './modal/modal';
 import ModalContent from './modal/modalContent';
 import useLocalStorage from './storage';
 import moment from 'moment';
-import { WordElement, AnswerElement, SolvedElement } from './data/element';
+import { WordElement, AnswerElement, SolvedElement, PuzzelSol } from './data/element';
 
 const SERVER_URL = process.env.REACT_APP_HOST_URL;
 
@@ -23,7 +23,6 @@ function App() {
   const [hardMode /*, setHardMode */] = useState(false);
   const [paintMode /*, setPaintMode */] = useState(true);
   const [guesses, setGuesses] = useState(4);
-  const [paints, setPaints] = useLocalStorage("paints", 0);
   const [submissions, setSubmissions] = useLocalStorage<Array<WordElement[]>>("submitted", []);
   const [answers, setAnswers] = useLocalStorage<AnswerElement[]>("answers", []);
   const [puzzleDate, setPuzzleDate] = useLocalStorage("puzzleDate", "");
@@ -31,6 +30,7 @@ function App() {
   const [catColor, setCatColor] = useState(1);
   const [showModal, setShowModal] = useState(false);
   const [reqPuzzleDate, setReqPuzzleDate] = useState(formatDate(moment()));
+  const [solvedDates, setSolvedDates] = useLocalStorage<PuzzelSol>("solvedDates", {});
 
   /**
    * arrows change req puzzel date
@@ -57,7 +57,15 @@ function App() {
             selected: false
             })));
           setAnswers([]);
-          setPaints(0);
+          if(!solvedDates[reqPuzzleDate]){
+            setSolvedDates({
+              ...solvedDates,
+              [reqPuzzleDate]: {
+                s: false,
+                g: 0
+              }
+            });
+          }
           setSubmissions([]);
           setPuzzleDate(date);
         } else if (puzzleDate !== date) {
@@ -65,7 +73,7 @@ function App() {
         }
       })
       .catch(err => console.log(err));
-  }, [paintMode]);
+  }, [paintMode, reqPuzzleDate]);
 
   useEffect(() => {
     if(guesses === 0){
@@ -140,19 +148,23 @@ function App() {
         }
       })
         .then(data => {
+            setLoading(false);
             const { correct, answers: updatedAnswers, oneAway } = data.data;
             if(!correct){
               const message = oneAway ? "Only Two Answers Wrong!" : "Incorrect Paint";
               addBoardToSubmissions();
               alert(message);
-              setPaints(paints + 1);
-              setLoading(false);
+              const updatedPuzzelDates = { ...solvedDates };
+              updatedPuzzelDates[reqPuzzleDate].g += 1;
+              setSolvedDates(updatedPuzzelDates);
               return;
             }
             setAnswers(updatedAnswers || []); 
             deselectBoard();
             setBoard([]);
-
+            const updatedPuzzelDates = { ...solvedDates };
+            updatedPuzzelDates[reqPuzzleDate].s = true;
+            setSolvedDates(updatedPuzzelDates);
         }).catch(err => {
           setLoading(false)
           console.log(err)
@@ -281,15 +293,20 @@ function App() {
   
   return (
     <AppContainer>
-      <Title>Phoney Connect</Title>
+      <DateControl>
+        <Button name="< Prev" disabled={moment(reqPuzzleDate) <= moment("2024-07-01")} onSubmit={() => { setReqPuzzleDate(moment(reqPuzzleDate).subtract(1, 'day').format("YYYY-MM-DD"))}}/>
+        <Title>Phoney Connect</Title>
+        <Button name="Next >" disabled={moment(reqPuzzleDate).add(1, 'day') >= moment() } onSubmit={() => { setReqPuzzleDate(moment(reqPuzzleDate).add(1, 'day').format("YYYY-MM-DD"))}}/>
+      </DateControl>
       <SubTitle>
       <SubT>Create Four Categories with Any Four Colors</SubT>
       <Detail>
           <InfoLink href="https://github.com/petersimonsen/lonely-connect" rel="noreferrer" target="_blank">Github➚</InfoLink>
+          <PuzzleDate>{moment(reqPuzzleDate).format("LL")} {solvedDates[reqPuzzleDate] && solvedDates[reqPuzzleDate].s ? `✅ (${solvedDates[reqPuzzleDate].g + 1})` : null}</PuzzleDate>
           <DetailVisible onClick={toggleModal}>ⓘ</DetailVisible>
       </Detail>
       {/*<div>
-      <HardMode>
+      <HardMode>  
         <input disabled={answers.length > 0} type="checkbox" value={hardMode} onInput={() => {
           setHardMode(!hardMode)
           setPaintMode(false);
@@ -331,7 +348,7 @@ function App() {
       {paintMode && <PaintContainer>{Object.keys(colorVal).map((key) => {
         return <ColorBox selected={key === `${catColor}`} color={colorVal[key]} onClick={() => setCatColor(Number(key))} />
       })}</PaintContainer>}
-      <Guesses paintMode={paintMode} guesses={(paintMode) ? paints : guesses} />
+      <Guesses paintMode={paintMode} guesses={solvedDates[reqPuzzleDate] ? solvedDates[reqPuzzleDate].g : 0} />
       <div>
           <Button name="Sort" onSubmit={sortBoard}/>
           <Button name="Shuffle" onSubmit={shuffleBoard}/>
@@ -344,6 +361,18 @@ function App() {
     </AppContainer>
   );
 }
+
+const PuzzleDate = styled.h4`
+  padding: 0;
+  margin: 0;
+`;
+
+const DateControl = styled.div`
+  display: flex;
+  width: 100%;
+  justify-content: space-around;
+  align-items: baseline;
+`;
 
 const SubT = styled.h5`
   padding: 10px 5px;

@@ -20,6 +20,8 @@ const moment = require('moment');
 const PUZZLE_FILE_PATH = path.join(__dirname, '/puzzles');
 // const DAILY_PATH = `${puzzlePath}/daily.json`;
 
+const checkPuzzleFile = (fileName) => fs.existsSync(`${PUZZLE_FILE_PATH}/${fileName}.json`);
+
 const getPuzzleFile = (fileName) => {
 	const rawData = fs.readFileSync(`${PUZZLE_FILE_PATH}/${fileName}.json`);
 	return JSON.parse(rawData);
@@ -29,7 +31,7 @@ const requestPuzzleForDay = async (day = moment()) => {
 	try {
 		console.log("Generating Puzzle Request...");
 		const dailyPuzzel = await getPuzzle(day);
-		const fileName = dailyPuzzel["print_date"];
+		const fileName = dailyPuzzel.data["print_date"];
 		console.log("Puzzle Recieved, writing file...");
 		fs.writeFileSync(`${PUZZLE_FILE_PATH}/${fileName}.json`, JSON.stringify(dailyPuzzel.data));
 		console.log("Puzzle File Written...");
@@ -55,10 +57,16 @@ app.get('/', function(req, res) {
 	res.sendFile(path.join(__dirname, '../build', 'index.html'));
 });
 
-app.get('/board', (req, res) => {
+app.get('/board', async (req, res) => {
 	const date = req.query.date;
 	console.log(date);
-	const board = convertNYTSolutionBOARD(currentPuzzel);
+	let puzBoard = currentPuzzel;
+	if(!checkPuzzleFile(date)){
+		await requestPuzzleForDay(moment(date));
+	}
+	puzBoard = getPuzzleFile(date);
+	const board = convertNYTSolutionBOARD(puzBoard);
+	currentPuzzel = puzBoard;
 	res.send(board);
 });
 

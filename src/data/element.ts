@@ -16,3 +16,10 @@ export type SolvedElement = {
 	level: number;
 	val: string[];
 }
+
+export type PuzzelSol = {
+    [key: string]: {
+        s: boolean;
+        g: number;
+    };
+}

@@ -19,6 +19,7 @@
 /server/puzzles
 
 # misc
+.vscode/
 .DS_Store
 .env
 .env.local
