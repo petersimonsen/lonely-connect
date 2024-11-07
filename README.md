@@ -16,6 +16,7 @@ Currently the game is doing a simple track of screen width at 400px. Futher enha
 
 - View Archives! View previous wins and number of attempts
 - Sort, Shuffle & Clear
+- Updates Daily
 
 ## Motive
 
