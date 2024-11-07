@@ -143,6 +143,7 @@ function App() {
         answers?: AnswerElement[];
       }>(`${SERVER_URL}/paint`, {
           values: board,
+          date: reqPuzzleDate
       }, {
         headers: {
           'Content-Type': 'application/json'
@@ -201,7 +202,8 @@ function App() {
     //const response = await connectValues(values);
     axios.post(`${SERVER_URL}/connect`, {
         values: elements.map(el => el.name),
-        description: input
+        description: input,
+        date: reqPuzzleDate
     }, {
       headers: {
         'Content-Type': 'application/json'
@@ -247,7 +249,8 @@ function App() {
 
   const solvePuzzle = () => {
       axios.post<SolvedElement[]>(`${SERVER_URL}/solve`, {
-        answers
+        answers,
+        date: reqPuzzleDate
       },{
           headers: {
             'Content-Type': 'application/json'

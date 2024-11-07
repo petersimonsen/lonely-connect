@@ -1,6 +1,6 @@
 {
-  "name": "lonely-connect",
-  "version": "0.1.0",
+  "name": "phoney-connect",
+  "version": "1.0.0",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
@@ -53,10 +53,14 @@
     "node": "21.x"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/node-cron": "^3.0.11",
     "source-map-loader": "^5.0.0",
     "ts-loader": "^9.5.1"
   },
   "jest": {
-    "transformIgnorePatterns": ["node_modules\/(?!axios)"]
+    "transformIgnorePatterns": [
+      "node_modules/(?!axios)"
+    ]
   }
 }

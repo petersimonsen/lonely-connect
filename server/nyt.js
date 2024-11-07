@@ -1,5 +1,9 @@
+const path = require('path');
+const fs = require('node:fs');
 const axios = require("axios");
 const moment = require("moment");
+
+const PUZZLE_FILE_PATH = path.join(__dirname, '/puzzles');
 
 const getPuzzle = async (requestData = moment()) => {
 	let date = requestData;
@@ -11,5 +15,29 @@ const getPuzzle = async (requestData = moment()) => {
 	const daily = await axios.get(url);
 	return daily;
 }
+const getPuzzleFile = (fileName) => {
+	const rawData = fs.readFileSync(`${PUZZLE_FILE_PATH}/${fileName}.json`);
+	return JSON.parse(rawData);
+};
+const checkPuzzleFile = (fileName) => fs.existsSync(`${PUZZLE_FILE_PATH}/${fileName}.json`);
 
-module.exports = { getPuzzle };
+const requestPuzzleForDay = async (day = moment()) => {
+	try {
+		console.log(`Requesting Puzzel ${day}...`);
+		const dailyPuzzel = await getPuzzle(day);
+		const fileName = dailyPuzzel.data["print_date"];
+		console.log("Puzzle Recieved, writing file...");
+		fs.writeFileSync(`${PUZZLE_FILE_PATH}/${fileName}.json`, JSON.stringify(dailyPuzzel.data));
+		console.log("Puzzle File Written...");
+	} catch (err) {
+		console.log("Error Retrieving Puzzel: ");
+		console.log(err);	
+	}
+}
+
+module.exports = { getPuzzle,
+	getPuzzleFile,
+	checkPuzzleFile,
+	PUZZLE_FILE_PATH,
+	requestPuzzleForDay
+};

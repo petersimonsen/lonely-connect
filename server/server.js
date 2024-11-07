@@ -1,57 +1,35 @@
 const express = require('express');
-const app = express();
 const cors = require('cors');
-const path = require('path');
 const cron = require('node-cron');
-const port = process.env.PORT || 8080;
-const fs = require('node:fs');
+const path = require('path');
 const { 
-	connectionsFromSubmittedVals, 
-	respondToConnections, 
-	matchDescription,
-	checkPaintConnections,
-	paintDescriptionsByCategory,
-	convertNYTSolutionBOARD,
-	convertNYTSolutionSOLVE,
+       connectionsFromSubmittedVals, 
+       respondToConnections, 
+       matchDescription,
+       checkPaintConnections,
+       paintDescriptionsByCategory,
+       convertNYTSolutionBOARD,
+       convertNYTSolutionSOLVE,
 } = require('./serverUtils');
-const { getPuzzle } = require('./nyt');
+const { 
+	checkPuzzleFile, 
+	getPuzzleFile,
+	requestPuzzleForDay
+ } = require('./nyt');
 const moment = require('moment');
 
-const PUZZLE_FILE_PATH = path.join(__dirname, '/puzzles');
-// const DAILY_PATH = `${puzzlePath}/daily.json`;
-
-const checkPuzzleFile = (fileName) => fs.existsSync(`${PUZZLE_FILE_PATH}/${fileName}.json`);
-
-const getPuzzleFile = (fileName) => {
-	const rawData = fs.readFileSync(`${PUZZLE_FILE_PATH}/${fileName}.json`);
-	return JSON.parse(rawData);
-}
-
-const requestPuzzleForDay = async (day = moment()) => {
-	try {
-		console.log(`Requesting Puzzel ${day}...`);
-		const dailyPuzzel = await getPuzzle(day);
-		const fileName = dailyPuzzel.data["print_date"];
-		console.log("Puzzle Recieved, writing file...");
-		fs.writeFileSync(`${PUZZLE_FILE_PATH}/${fileName}.json`, JSON.stringify(dailyPuzzel.data));
-		console.log("Puzzle File Written...");
-		currentPuzzel = getPuzzleFile(fileName);
-		console.log("...Updated Puzzel");
-	} catch (err) {
-		console.log("Error Retrieving Puzzel: ");
-		console.log(err);	
-	}
-}
-
-let currentPuzzel = null;
+const app = express();
+const port = process.env.PORT || 8080;
+const CRON = process.env.REACT_APP_CRON || '0 6 * * *';
 
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../build')));
 
-requestPuzzleForDay(moment());
-
-cron.schedule('0 6 * * *', async () => requestPuzzleForDay(moment()));
+cron.schedule(CRON, async () => {
+	console.log(`CRON RUNNING: ${moment()}`)
+	requestPuzzleForDay(moment())
+});
 
 app.get('/', function(req, res) {
 	res.sendFile(path.join(__dirname, '../build', 'index.html'));
@@ -60,22 +38,25 @@ app.get('/', function(req, res) {
 app.get('/board', async (req, res) => {
 	const date = req.query.date;
 	console.log(date);
-	let puzBoard = currentPuzzel;
 	if(!checkPuzzleFile(date)){
 		await requestPuzzleForDay(moment(date));
 	}
-	puzBoard = getPuzzleFile(date);
-	const board = convertNYTSolutionBOARD(puzBoard);
-	currentPuzzel = puzBoard;
+	const currentPuzzel = getPuzzleFile(date);
+	const board = convertNYTSolutionBOARD(currentPuzzel);
 	res.send(board);
 });
 
 app.post('/connect', (req, res) => {
 	const submittedValues = req.body.values;
+	const date = req.body.data;
+	if(!checkPuzzleFile(date)){
+		return res.status(400).send("Date Not Available");
+	}
 	if(submittedValues.length !== 4) {
 		return res.status(400).send("Bad Request");
 	}
 
+	const currentPuzzel = getPuzzleFile(date);
 	const connections = connectionsFromSubmittedVals(submittedValues, currentPuzzel);
 	const response = respondToConnections(connections, currentPuzzel);
 	const description = req.body.description;
@@ -87,10 +68,15 @@ app.post('/connect', (req, res) => {
 });
 
 app.post('/paint', (req, res) => {
+	const date = req.body.date;
 	const submittedValues = req.body.values;
 	if(submittedValues.length !== 16) {
 		return res.status(400).send("Bad Request");
 	}
+	if(!checkPuzzleFile(date)){
+		return res.status(400).send("Date Not Available");
+	}
+	const currentPuzzel = getPuzzleFile(date);
 
 	const { correct, oneAway } = checkPaintConnections(submittedValues, currentPuzzel);
 	if(!correct){
@@ -110,6 +96,11 @@ app.post('/paint', (req, res) => {
 });
 
 app.post('/solve', (req, res) => {
+	const date = req.body.data;
+	if(!checkPuzzleFile(date)){
+		return res.status(400).send("Date Not Available");
+	}
+	const currentPuzzel = getPuzzleFile(date);
 	const submittedAnswers = req.body.answers;
 	const answerNames = submittedAnswers.reduce((elements, el) => elements.concat(el.answers), []).map(el => el.name);
 	const solve = convertNYTSolutionSOLVE(currentPuzzel);
@@ -117,6 +108,9 @@ app.post('/solve', (req, res) => {
     res.send(otherSolves);
 });
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
 	console.log("Server listening on port " + port);
+	requestPuzzleForDay(moment());
 });
+
+module.exports = server;
