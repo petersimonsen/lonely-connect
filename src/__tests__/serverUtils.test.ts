@@ -2,14 +2,14 @@ import serverUtils from "../../server/serverUtils";
 import MOCK_TEST_DATA from '../../server/puzzles/__tests__/TEST_DATA.json'
 
 describe('ServerUtils', () => {
-    describe('convertNYTSolutionSOLVE', () => {
+    describe('convertConnectSolutionSolution', () => {
         it('should return the solved board by level', () => {
-            expect(serverUtils.convertNYTSolutionSOLVE(MOCK_TEST_DATA.testData)).toEqual(MOCK_TEST_DATA.solvedData)
+            expect(serverUtils.convertConnectSolutionSolution(MOCK_TEST_DATA.testData)).toEqual(MOCK_TEST_DATA.solvedData)
         });
     });
-    describe('convertNYTSolutionBOARD', () => {
+    describe('convertConnectSolutionBoard', () => {
         it('should return the basic board', () => {
-            expect(serverUtils.convertNYTSolutionBOARD(MOCK_TEST_DATA.testData)).toEqual(MOCK_TEST_DATA.puzzleFormat)
+            expect(serverUtils.convertConnectSolutionBoard(MOCK_TEST_DATA.testData)).toEqual(MOCK_TEST_DATA.puzzleFormat)
         });
     });
     describe('connectionsFromSubmittedVals', () => {

@@ -1,7 +1,8 @@
-import { connectionsFromSubmittedVals, respondToConnections, matchDescription, checkPaintConnections, paintDescriptionsByCategory, convertNYTSolutionBOARD, convertNYTSolutionSOLVE } from './serverUtils';
-import { checkPuzzleFile, getPuzzleFile, requestPuzzleForDay } from './nyt';
+
+import { checkPuzzleFile, getPuzzleFile, requestPuzzleForDay } from './data';
 import moment from 'moment';
 import {Request, Response} from 'express';
+import { convertConnectSolutionBoard } from './serverUtils';
 
 interface PuzzleRequestQuery {
 	date: string;
@@ -9,11 +10,10 @@ interface PuzzleRequestQuery {
 
 export const getBoardHandler = async (req: Request<{}, {}, {}, PuzzleRequestQuery>, res: Response) => {
 	const date = req.query.date;
-	console.log(date);
 	if(!checkPuzzleFile(date)){
 		await requestPuzzleForDay(moment(date));
 	}
 	const currentPuzzel = getPuzzleFile(date);
-	const board = convertNYTSolutionBOARD(currentPuzzel);
+	const board = convertConnectSolutionBoard(currentPuzzel);
 	res.send(board);
 };

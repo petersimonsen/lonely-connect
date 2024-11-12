@@ -1,4 +1,4 @@
-const convertNYTSolutionSOLVE = (solution) => solution["categories"].map((cat, i) => {
+const convertConnectSolutionSolution = (solution) => solution["categories"].map((cat, i) => {
 	return {
 		"desc": cat["title"],
 		"level": i,
@@ -7,7 +7,7 @@ const convertNYTSolutionSOLVE = (solution) => solution["categories"].map((cat, i
 });
 
 const connectionsFromSubmittedVals = (submittedVals, puzzle) => {
-	const solve = convertNYTSolutionSOLVE(puzzle);
+	const solve = convertConnectSolutionSolution(puzzle);
 
 	const sortedSolve = solve.map((info) => {
 		return info["val"].sort();
@@ -41,7 +41,7 @@ const serverUtils = {
 	groupSubmittedElementsByCategory,
 
 	respondToConnections: (connections, puzzle) => {
-		const solve = convertNYTSolutionSOLVE(puzzle);
+		const solve = convertConnectSolutionSolution(puzzle);
 		const connectVals = Object.values(connections);
 		
 		const correct = connectVals[0] === 4;
@@ -75,7 +75,7 @@ const serverUtils = {
 
 	paintDescriptionsByCategory: (elements, puzzle) => {
 		//elements assumed to be correct
-		const solve = convertNYTSolutionSOLVE(puzzle);
+		const solve = convertConnectSolutionSolution(puzzle);
 		const sortedElements = elements.sort((a, b) => {
 			return a["categoryLevel"] - b["categoryLevel"];
 		});
@@ -106,7 +106,7 @@ const serverUtils = {
 		return contains && decentLengthMatch;
 	},
 	
-	convertNYTSolutionBOARD: (solution) => {
+	convertConnectSolutionBoard: (solution) => {
 		const board = Array(16);
 		solution["categories"].forEach((cat) => {
 			cat["cards"].forEach((card) => {
@@ -121,7 +121,7 @@ const serverUtils = {
 		};
 	},
 
-	convertNYTSolutionSOLVE,
+	convertConnectSolutionSolution,
 
 }
 

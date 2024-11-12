@@ -1,6 +1,6 @@
 import cron from 'node-cron';
 import fs from 'node:fs';
-const nyt = require('../../server/nyt');
+const dataAccess = require('../../server/data');
 
 jest.mock('node-cron', () => {
     return {
@@ -36,7 +36,7 @@ const sleep = ms => {
 describe('server', () => {
     test('can run both setup query and CRON job', async () => {
         await sleep(1000);
-        const logSpy = jest.spyOn(nyt, 'requestPuzzleForDay');
+        const logSpy = jest.spyOn(dataAccess, 'requestPuzzleForDay');
         cron.schedule.mockImplementationOnce(async (freq, callback) => {
             await sleep(1000);
             await callback();
@@ -46,6 +46,7 @@ describe('server', () => {
         expect(cron.schedule).toHaveBeenCalledWith("0 6 * * *", expect.any(Function));
         expect(logSpy).toHaveBeenCalledTimes(2);
         expect(fs.writeFileSync).toHaveBeenCalledTimes(2);
+        await sleep(1000);
         serv.close();
     });
     afterAll(() => {

@@ -2,20 +2,21 @@ const express = require('express');
 const cors = require('cors');
 const cron = require('node-cron');
 const path = require('path');
+require('dotenv').config()
 const { 
        connectionsFromSubmittedVals, 
        respondToConnections, 
        matchDescription,
        checkPaintConnections,
        paintDescriptionsByCategory,
-       convertNYTSolutionBOARD,
-       convertNYTSolutionSOLVE,
+       convertConnectSolutionBoard: convertConnectSolutionBoard,
+       convertConnectSolutionSolution: convertConnectSolutionSolution,
 } = require('./serverUtils');
 const { 
 	checkPuzzleFile, 
 	getPuzzleFile,
 	requestPuzzleForDay
- } = require('./nyt');
+ } = require('./data');
 const moment = require('moment');
 
 const app = express();
@@ -41,7 +42,7 @@ app.get('/board', async (req, res) => {
 		await requestPuzzleForDay(moment(date));
 	}
 	const currentPuzzel = getPuzzleFile(date);
-	const board = convertNYTSolutionBOARD(currentPuzzel);
+	const board = convertConnectSolutionBoard(currentPuzzel);
 	res.send(board);
 });
 
@@ -102,7 +103,7 @@ app.post('/solve', (req, res) => {
 	const currentPuzzel = getPuzzleFile(date);
 	const submittedAnswers = req.body.answers;
 	const answerNames = submittedAnswers.reduce((elements, el) => elements.concat(el.answers), []).map(el => el.name);
-	const solve = convertNYTSolutionSOLVE(currentPuzzel);
+	const solve = convertConnectSolutionSolution(currentPuzzel);
     const otherSolves = solve.filter((el) => !el.val.some((name) => answerNames.indexOf(name) != -1));
     res.send(otherSolves);
 });

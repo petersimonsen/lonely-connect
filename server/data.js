@@ -2,8 +2,10 @@ const path = require('path');
 const fs = require('node:fs');
 const axios = require("axios");
 const moment = require("moment");
+require('dotenv').config()
 
 const PUZZLE_FILE_PATH = path.join(__dirname, '/puzzles');
+const API_REQUEST_HOST = process.env.REACT_APP_API_REQUEST;
 
 const getPuzzle = async (requestData = moment()) => {
 	let date = requestData;
@@ -11,7 +13,9 @@ const getPuzzle = async (requestData = moment()) => {
 		date = moment();
 	}
 	const apiString = date.format("YYYY-MM-DD");
-	const url = `https://www.nytimes.com/svc/connections/v2/${apiString}.json`;
+	const url = `${API_REQUEST_HOST}${apiString}.json`;
+	console.log(url);
+	console.log(process.env);
 	const daily = await axios.get(url);
 	return daily;
 }
