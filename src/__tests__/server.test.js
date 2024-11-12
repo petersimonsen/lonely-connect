@@ -34,8 +34,8 @@ const sleep = ms => {
 }
 
 describe('server', () => {
-    test('can run server', async () => {
-        console.log("SERVER TEST");
+    test('can run both setup query and CRON job', async () => {
+        await sleep(1000);
         const logSpy = jest.spyOn(nyt, 'requestPuzzleForDay');
         cron.schedule.mockImplementationOnce(async (freq, callback) => {
             await sleep(1000);
@@ -48,4 +48,7 @@ describe('server', () => {
         expect(fs.writeFileSync).toHaveBeenCalledTimes(2);
         serv.close();
     });
+    afterAll(() => {
+        jest.clearAllMocks();
+    })
 });

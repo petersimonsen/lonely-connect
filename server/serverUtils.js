@@ -26,8 +26,19 @@ const connectionsFromSubmittedVals = (submittedVals, puzzle) => {
 	return connections;
 };
 
+const groupSubmittedElementsByCategory = (elements) => elements.reduce((dict, el) => {
+	if(!dict[el["categoryLevel"]]){
+		dict[el["categoryLevel"]] = [el];
+	} else {
+		dict[el["categoryLevel"]].push(el);
+	}
+	dict[el["categoryLevel"]].sort();
+	return dict;
+},{});
+
 const serverUtils = {
 	connectionsFromSubmittedVals,
+	groupSubmittedElementsByCategory,
 
 	respondToConnections: (connections, puzzle) => {
 		const solve = convertNYTSolutionSOLVE(puzzle);
@@ -46,20 +57,12 @@ const serverUtils = {
 	},
 
 	checkPaintConnections: (elements, puzzle) => {
-		const groupedEl = elements.reduce((dict, el) => {
-			if(!dict[el["categoryLevel"]]){
-				dict[el["categoryLevel"]] = [el];
-			} else {
-				dict[el["categoryLevel"]].push(el);
-			}
-			dict[el["categoryLevel"]].sort();
-			return dict;
-		},{});
+		const groupedEl = groupSubmittedElementsByCategory(elements);
 		const connectionsEach = Object.values(groupedEl).map((els) => connectionsFromSubmittedVals(els.map(el => el.name), puzzle));
 		let matchCounter = 0;
 		let threeCounter = 0;
 		connectionsEach.forEach((connections) => {
-			connectVals = Object.values(connections);
+			let connectVals = Object.values(connections);
 			if(connectVals[0] === 4) matchCounter++;
 			if(connectVals.some((val) => val === 3)) threeCounter++;
 		});

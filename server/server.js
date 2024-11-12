@@ -37,7 +37,6 @@ app.get('/', function(req, res) {
 
 app.get('/board', async (req, res) => {
 	const date = req.query.date;
-	console.log(date);
 	if(!checkPuzzleFile(date)){
 		await requestPuzzleForDay(moment(date));
 	}

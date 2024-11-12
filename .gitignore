@@ -19,7 +19,8 @@
 
 # puzzel files
 
-/server/puzzles
+/server/puzzles/*
+!/server/puzzles/__tests__
 
 # misc
 .vscode/
