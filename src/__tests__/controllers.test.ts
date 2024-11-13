@@ -1,5 +1,5 @@
 import request from 'supertest';
-const server = require('../../server/server');
+// const server = require('../../server/server');
 import MOCK_TEST_DATA from '../../server/puzzles/__tests__/TEST_DATA.json';
 import fs from 'node:fs';
 import axios from 'axios';
@@ -22,9 +22,9 @@ jest.mock('node:fs', () => {
 
 describe('board route', () => {
     test.skip('should return a board if it has a valid date', async () => {
-        const res = await request(server).get('/board?date=2024-11-07')
-        expect(res.statusCode).toEqual(200);
-        expect(res.body).toEqual(MOCK_TEST_DATA.puzzleFormat);
+        // const res = await request(server).get('/board?date=2024-11-07')
+        // expect(res.statusCode).toEqual(200);
+        // expect(res.body).toEqual(MOCK_TEST_DATA.puzzleFormat);
     })
     
 })

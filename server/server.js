@@ -9,8 +9,8 @@ const {
        matchDescription,
        checkPaintConnections,
        paintDescriptionsByCategory,
-       convertConnectSolutionBoard: convertConnectSolutionBoard,
-       convertConnectSolutionSolution: convertConnectSolutionSolution,
+       convertConnectSolutionBoard,
+       convertConnectSolutionSolution,
 } = require('./serverUtils');
 const { 
 	checkPuzzleFile, 

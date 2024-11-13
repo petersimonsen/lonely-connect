@@ -14,8 +14,6 @@ const getPuzzle = async (requestData = moment()) => {
 	}
 	const apiString = date.format("YYYY-MM-DD");
 	const url = `${API_REQUEST_HOST}${apiString}.json`;
-	console.log(url);
-	console.log(process.env);
 	const daily = await axios.get(url);
 	return daily;
 }
