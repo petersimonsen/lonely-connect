@@ -28,13 +28,13 @@ describe('ServerUtils', () => {
     describe('groupSubmittedElementsByCategory', () => {
         it('should return submitted elements by category level', () => {
             expect(serverUtils.groupSubmittedElementsByCategory(
-                MOCK_TEST_DATA.submittedPaint.values)).toEqual(MOCK_TEST_DATA.submittedCategoryGrouped)
+                MOCK_TEST_DATA.submittedPaintWrong.values)).toEqual(MOCK_TEST_DATA.submittedCategoryGrouped)
         });
     });
     describe('checkPaintConnections', () => {
         it('should return that none are correct from a basic guess', () => {
             expect(serverUtils.checkPaintConnections(
-                MOCK_TEST_DATA.submittedPaint.values, 
+                MOCK_TEST_DATA.submittedPaintWrong.values, 
                 MOCK_TEST_DATA.testData)).toEqual(MOCK_TEST_DATA.submittedWrong)
         });
     });
