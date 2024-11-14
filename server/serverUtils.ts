@@ -71,11 +71,11 @@ export const groupSubmittedElementsByCategory = (elements: SubmittedVal[]): Grou
 }, {});
 
 export type ConnectResponse = {
-	correct?: boolean;
-	categoryDescription?: string;
-	categoryLevel?: number | null;
-	descriptionWrong?: boolean;
-	oneAway?: boolean;
+	correct: boolean;
+	categoryDescription: string;
+	categoryLevel: number | null;
+	descriptionWrong: boolean;
+	oneAway: boolean;
 }
 
 export const parseConnectionNames = (connections: SubmittedConnection, puzzle: InputConnect): ConnectResponse => {

@@ -2,10 +2,13 @@ const express = require('express');
 const cors = require('cors');
 const cron = require('node-cron');
 const path = require('path');
-require('dotenv').config()
-const { requestPuzzleForDay } = require('./data');
+const data = require('./data');
 const moment = require('moment');
 const { getBoardHandler, paintHandler, connectAnswerHandler, solveHandler } = require('./controllers');
+const { errorHandlerMiddleware } = require('./errors/middleware');
+
+require('express-async-errors');
+require('dotenv').config()
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -14,6 +17,7 @@ const CRON = process.env.REACT_APP_CRON || '0 6 * * *';
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../build')));
+app.use(errorHandlerMiddleware);
 
 cron.schedule(CRON, async () => {
 	console.log(`CRON RUNNING: ${moment()}`)

@@ -2,8 +2,9 @@
 import { checkPuzzleFile, getPuzzleFile, requestPuzzleForDay } from './data';
 import moment from 'moment';
 import {Request, Response} from 'express';
-import { checkPaintConnections, connectionsFromSubmittedVals, convertConnectSolutionBoard, convertConnectSolutionSolution, matchDescription, PaintAnswers, paintDescriptionsByCategory, parseConnectionNames, SubmittedVal } from './serverUtils';
+import { checkPaintConnections, connectionsFromSubmittedVals, ConnectResponse, convertConnectSolutionBoard, convertConnectSolutionSolution, matchDescription, PaintAnswers, paintDescriptionsByCategory, parseConnectionNames, SubmittedVal } from './serverUtils';
 import { AnswerElement, WordElement } from '../src/data/element';
+import { BadRequestError } from './errors/error';
 
 export const getBoardHandler = async (req: Request<{}, {}, {}, { date: string }>, res: Response) => {
 	const date = req.query.date;
@@ -24,17 +25,24 @@ interface PaintReturn {
 	correct: boolean;
 	oneAway?: boolean;
 	answers?: PaintAnswers[];
-	error?: string;
 };
 
 export const paintHandler = async(req: Request<{}, {}, PuzzleRequest, {}>, res: Response<PaintReturn>) => {
 	const date = req.body.date;
 	const submittedValues = req.body.values;
 	if(submittedValues.length !== 16) {
-		return res.status(400).send({ correct: false, error: "Bad Request"});
+		throw new BadRequestError({
+			code: 400,
+			message: "Improper value size: " + submittedValues.length,
+			logging: true
+		});
 	}
 	if(!checkPuzzleFile(date)){
-		return res.status(400).send({ correct: false, error: "Date Not Available"});
+		throw new BadRequestError({
+			code: 400,
+			message: "Date not available: " + date,
+			logging: true
+		});
 	}
 	const currentPuzzel = getPuzzleFile(date);
 
@@ -62,21 +70,22 @@ export const connectAnswerHandler = async (req: Request<{}, {}, {
 	date: string;
 	description?: string;
 	values: string[];
-}, {}>, res: Response<{
-	correct?: boolean;
-	categoryDescription?: string;
-	categoryLevel?: number | null;
-	descriptionWrong?: boolean;
-	oneAway?: boolean;
-	error?: string;
-}>) => {
+}, {}>, res: Response<ConnectResponse>) => {
 	const submittedValues = req.body.values;
 	const date = req.body.date;
 	if(!checkPuzzleFile(date)){
-		return res.status(400).send({ error: "Date Not Available"});
+		throw new BadRequestError({
+			code: 400,
+			message: "Date not available: " + date,
+			logging: true
+		});
 	}
 	if(submittedValues.length !== 4) {
-		return res.status(400).send({ error: "Bad Request"});
+		throw new BadRequestError({
+			code: 400,
+			message: "Improper value size: " + submittedValues.length,
+			logging: true
+		});
 	}
 
 	const currentPuzzel = getPuzzleFile(date);
@@ -96,7 +105,11 @@ export const solveHandler = async (req: Request<{}, {}, {
 }>, res: Response) => {
 	const date = req.body.date;
 	if(!checkPuzzleFile(date)){
-		return res.status(400).send("Date Not Available");
+		throw new BadRequestError({
+			code: 400,
+			message: "Date not available: " + date,
+			logging: true
+		});
 	}
 	const currentPuzzel = getPuzzleFile(date);
 	const submittedAnswers = req.body.answers;
