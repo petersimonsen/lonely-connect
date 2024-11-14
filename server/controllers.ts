@@ -2,7 +2,8 @@
 import { checkPuzzleFile, getPuzzleFile, requestPuzzleForDay } from './data';
 import moment from 'moment';
 import {Request, Response} from 'express';
-import { checkPaintConnections, connectionsFromSubmittedVals, convertConnectSolutionBoard, convertConnectSolutionSolution, matchDescription, paintDescriptionsByCategory, respondToConnections } from './serverUtils';
+import { checkPaintConnections, connectionsFromSubmittedVals, convertConnectSolutionBoard, convertConnectSolutionSolution, matchDescription, PaintAnswers, paintDescriptionsByCategory, parseConnectionNames, SubmittedVal } from './serverUtils';
+import { AnswerElement, WordElement } from '../src/data/element';
 
 export const getBoardHandler = async (req: Request<{}, {}, {}, { date: string }>, res: Response) => {
 	const date = req.query.date;
@@ -16,13 +17,13 @@ export const getBoardHandler = async (req: Request<{}, {}, {}, { date: string }>
 
 interface PuzzleRequest {
 	date: string;
-	values: any[];
+	values: SubmittedVal[];
 };
 
 interface PaintReturn {
 	correct: boolean;
 	oneAway?: boolean;
-	answers?: any[];
+	answers?: PaintAnswers[];
 	error?: string;
 };
 
@@ -60,7 +61,7 @@ export const paintHandler = async(req: Request<{}, {}, PuzzleRequest, {}>, res: 
 export const connectAnswerHandler = async (req: Request<{}, {}, {
 	date: string;
 	description?: string;
-	values: any[];
+	values: string[];
 }, {}>, res: Response<{
 	correct?: boolean;
 	categoryDescription?: string;
@@ -80,18 +81,18 @@ export const connectAnswerHandler = async (req: Request<{}, {}, {
 
 	const currentPuzzel = getPuzzleFile(date);
 	const connections = connectionsFromSubmittedVals(submittedValues, currentPuzzel);
-	const response = respondToConnections(connections, currentPuzzel);
+	const parsedConnections = parseConnectionNames(connections, currentPuzzel);
 	const description = req.body.description;
-	if(response["correct"] && description && description.length > 0 && !matchDescription(description, response["categoryDescription"])){
-		response["categoryDescription"] = "";
-		response["descriptionWrong"] = true;
+	if(parsedConnections["correct"] && description && description.length > 0 && !matchDescription(description, parsedConnections["categoryDescription"]!)){
+		parsedConnections["categoryDescription"] = "";
+		parsedConnections["descriptionWrong"] = true;
 	}
-	res.send(response);
+	res.send(parsedConnections);
 };
 
 export const solveHandler = async (req: Request<{}, {}, {
 	date: string;
-	answers: any[];
+	answers: AnswerElement[];
 }>, res: Response) => {
 	const date = req.body.date;
 	if(!checkPuzzleFile(date)){
@@ -99,7 +100,7 @@ export const solveHandler = async (req: Request<{}, {}, {
 	}
 	const currentPuzzel = getPuzzleFile(date);
 	const submittedAnswers = req.body.answers;
-	const answerNames = submittedAnswers.reduce((elements, el) => elements.concat(el.answers), []).map((el: any) => el.name);
+	const answerNames = submittedAnswers.reduce((elements: WordElement[], el) => elements.concat(el.answers), []).map((el: any) => el.name);
 	const solve = convertConnectSolutionSolution(currentPuzzel);
     const otherSolves = solve.filter((el: any) => !el.val.some((name: any) => answerNames.indexOf(name) != -1));
     res.send(otherSolves);

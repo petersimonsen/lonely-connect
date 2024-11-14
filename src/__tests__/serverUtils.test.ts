@@ -1,4 +1,4 @@
-import serverUtils from "../../server/serverUtils";
+import * as serverUtils from "../../server/serverUtils";
 import MOCK_TEST_DATA from '../../server/puzzles/__tests__/TEST_DATA.json'
 
 describe('ServerUtils', () => {
