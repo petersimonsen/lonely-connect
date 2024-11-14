@@ -1,13 +1,13 @@
-const path = require('path');
-const fs = require('node:fs');
-const axios = require("axios");
-const moment = require("moment");
+import path from 'path';
+import fs from 'node:fs';
+import axios from "axios";
+import moment from "moment";
 require('dotenv').config()
 
 const PUZZLE_FILE_PATH = path.join(__dirname, '/puzzles');
 const API_REQUEST_HOST = process.env.REACT_APP_API_REQUEST;
 
-const getPuzzle = async (requestData = moment()) => {
+export const getPuzzle = async (requestData = moment()) => {
 	let date = requestData;
 	if(!requestData || typeof requestData.isValid === "undefined" || !requestData.isValid() || requestData < moment().subtract(30, 'days')){
 		date = moment();
@@ -17,29 +17,22 @@ const getPuzzle = async (requestData = moment()) => {
 	const daily = await axios.get(url);
 	return daily;
 }
-const getPuzzleFile = (fileName) => {
-	const rawData = fs.readFileSync(`${PUZZLE_FILE_PATH}/${fileName}.json`);
+export const getPuzzleFile = (fileName: string) => {
+	const rawData = fs.readFileSync(`${PUZZLE_FILE_PATH}/${fileName}.json`, { encoding: 'utf8'});
 	return JSON.parse(rawData);
 };
-const checkPuzzleFile = (fileName) => fs.existsSync(`${PUZZLE_FILE_PATH}/${fileName}.json`);
+export const checkPuzzleFile = (fileName: string): boolean => fs.existsSync(`${PUZZLE_FILE_PATH}/${fileName}.json`);
 
-const requestPuzzleForDay = async (day = moment()) => {
+export const requestPuzzleForDay = async (day = moment()) => {
 	try {
 		console.log(`Requesting Puzzel ${day}...`);
 		const dailyPuzzel = await getPuzzle(day);
 		const fileName = dailyPuzzel.data["print_date"];
 		console.log("Puzzle Recieved, writing file...");
-		fs.writeFileSync(`${PUZZLE_FILE_PATH}/${fileName}.json`, JSON.stringify(dailyPuzzel.data));
+		fs.writeFileSync(`${PUZZLE_FILE_PATH}/${fileName}.json`, JSON.stringify(dailyPuzzel.data), { encoding: 'utf8'});
 		console.log("Puzzle File Written...");
 	} catch (err) {
 		console.log("Error Retrieving Puzzel: ");
 		console.log(err);	
 	}
-}
-
-module.exports = { getPuzzle,
-	getPuzzleFile,
-	checkPuzzleFile,
-	PUZZLE_FILE_PATH,
-	requestPuzzleForDay
 };
