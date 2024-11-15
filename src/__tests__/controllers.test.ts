@@ -35,6 +35,12 @@ describe('route controllers', () => {
             expect(res.statusCode).toEqual(200);
             expect(res.body).toEqual(MOCK_TEST_DATA.puzzleFormat);
         })
+
+        test('should return an error if passed a bad date', async () => {
+            serv = require('../../server/server');
+            const res = await request(serv).get('/board?date=2025-11-07')
+            expect(res.statusCode).toEqual(400);
+        })
     });
     describe('paint route', () => {
 
@@ -46,16 +52,16 @@ describe('route controllers', () => {
                 "date": "2024-05-20",
                 "values": []
             })
-            .set('Accept', 'application/json')
+            .set('Accept', 'application/json');
             expect(noValReq.statusCode).toEqual(400);
 
             const badDateReq = await request(serv)
             .post('/paint')
             .send({
-                "date": "2024-05-20",
-                "values": MOCK_TEST_DATA.submittedPaintWrong
+                "date": "2025-05-20",
+                "values": MOCK_TEST_DATA.submittedPaintWrong.values
             })
-            .set('Accept', 'application/json')
+            .set('Accept', 'application/json');
             expect(badDateReq.statusCode).toEqual(400);
         });    
 

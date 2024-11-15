@@ -4,7 +4,7 @@ import axios from "axios";
 import moment from "moment";
 require('dotenv').config()
 
-const PUZZLE_FILE_PATH = path.join(__dirname, '/puzzles');
+const PUZZLE_FILE_PATH = path.join(__dirname, '../puzzles');
 const API_REQUEST_HOST = process.env.REACT_APP_API_REQUEST;
 
 export const getPuzzle = async (requestData = moment()) => {

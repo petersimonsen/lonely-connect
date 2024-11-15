@@ -1,3 +1,5 @@
+import { Request, Response } from "express";
+
 const express = require('express');
 const cors = require('cors');
 const cron = require('node-cron');
@@ -16,7 +18,7 @@ const CRON = process.env.REACT_APP_CRON || '0 6 * * *';
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '../build')));
+app.use(express.static(path.join(__dirname, '../../build')));
 app.use(errorHandlerMiddleware);
 
 cron.schedule(CRON, async () => {
@@ -24,8 +26,8 @@ cron.schedule(CRON, async () => {
 	requestPuzzleForDay(moment())
 });
 
-app.get('/', function(req, res) {
-	res.sendFile(path.join(__dirname, '../build', 'index.html'));
+app.get('/', function(req: Request, res: Response) {
+	res.sendFile(path.join(__dirname, '../../build', 'index.html'));
 });
 
 app.get('/board', getBoardHandler);

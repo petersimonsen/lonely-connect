@@ -24,8 +24,8 @@ jest.mock('node:fs', () => {
     }
 }); 
 
-const sleep = ms => {
-    return new Promise(resolve => {
+const sleep = (ms: number) => {
+    return new Promise<void>(resolve => {
         setTimeout(() => {
             console.log(`Slept for ${ms/1000} seconds`);
             resolve();
@@ -37,7 +37,8 @@ describe('server', () => {
     test('can run both setup query and CRON job', async () => {
         await sleep(1000);
         const logSpy = jest.spyOn(dataAccess, 'requestPuzzleForDay');
-        cron.schedule.mockImplementationOnce(async (freq, callback) => {
+        let mockCronSchedule = <jest.Mock>(cron.schedule);
+        mockCronSchedule.mockImplementationOnce(async (freq: any, callback: () => void) => {
             await sleep(1000);
             await callback();
         });

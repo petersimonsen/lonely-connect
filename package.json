@@ -26,12 +26,12 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "react-scripts start", 
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "serve": "node server/server.js",
-    "deploy": "npm install && CI=true npm test && react-scripts build && node server/server.js"
+    "serve": "tsc --p server && node server/dist/server.js",
+    "deploy": "npm install && CI=true npm test && react-scripts build && npm run serve"
   },
   "eslintConfig": {
     "extends": [
