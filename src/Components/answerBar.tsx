@@ -1,9 +1,8 @@
+import { useContext } from 'react';
+import MobileContext from '../data/contexts';
 import styled from 'styled-components';
 import colorVal from './Utils';
 import { WordElement } from '../data/element';
-import { useMediaQuery } from 'react-responsive'
-
-const useMobile = () => useMediaQuery({maxWidth: 640});
 
 type AnswerBarProps = {
   elements: WordElement[];
@@ -13,7 +12,8 @@ type AnswerBarProps = {
 };
 
 const AnswerBar = ({elements, categoryLevel, index, description}: AnswerBarProps) => {
-    return <AnswerBarComponent categoryLevel={categoryLevel} mobile={useMobile()}>
+    const mobile = useContext(MobileContext);
+    return <AnswerBarComponent categoryLevel={categoryLevel} mobile={mobile}>
           <AnswerName>
             {description}
             </AnswerName>

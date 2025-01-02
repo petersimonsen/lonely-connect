@@ -1,7 +1,8 @@
+import { useContext } from 'react';
 import colorVal from './Utils';
 import styled from 'styled-components';
-import { useMediaQuery } from 'react-responsive'
 import { WordElement } from '../data/element';
+import MobileContext from '../data/contexts';
 
 
 const mobile = {
@@ -14,8 +15,6 @@ const desktop = {
   fontSize: "18px"
 }
 
-const useMobile = () => useMediaQuery({maxWidth: 640});
-
 export type ElementProps = WordElement & {
   index: number;
   key: number;
@@ -23,7 +22,8 @@ export type ElementProps = WordElement & {
 };
 
 export const Element = (props: ElementProps) => {
-  const ElementComponent = useMobile() ? ElBoxMobile : ElBoxDesktop;
+  const mobile = useContext(MobileContext);
+  const ElementComponent = mobile ? ElBoxMobile : ElBoxDesktop;
     return <ElementComponent  
       categoryLevel={props.categoryLevel}
       selectable={props.selectable}

@@ -1,7 +1,6 @@
-import { useMediaQuery } from 'react-responsive'
+import { useContext } from 'react';
 import styled from 'styled-components';
-
-const useMobile = () => useMediaQuery({maxWidth: 640});
+import MobileContext from '../data/contexts';
 
 export type GridProps = {
   columns: number;
@@ -34,9 +33,10 @@ export const Grid = styled.div<GridComponentProps>`
 
 
 export const ConnectGrid = (props: GridProps) => {
+  const mobile = useContext(MobileContext);
   return <Grid 
   {...props}
-  mobile={useMobile()}>
+  mobile={mobile}>
     {props.children}
   </Grid>;
 }

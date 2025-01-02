@@ -12,10 +12,13 @@ import moment from 'moment';
 import axios from 'axios';
 import { WordElement, AnswerElement, SolvedElement, PuzzelSol } from './data/element';
 import { ConnectGrid } from './Components/grid';
+import { useMediaQuery } from 'react-responsive';
+import MobileContext from './data/contexts';
 
 
 const SERVER_URL = process.env.REACT_APP_HOST_URL;
 
+const useMobile = () => useMediaQuery({maxWidth: 640});
 
 function App() {
   const formatDate = (date: moment.Moment): string => moment(date).format("YYYY-MM-DD");
@@ -297,6 +300,7 @@ function App() {
   }
   
   return (
+    <MobileContext.Provider value={useMobile()}>
     <AppContainer>
       <DateControl>
         <Button name="< Prev" disabled={moment(reqPuzzleDate) <= moment("2024-07-01")} onSubmit={() => { setReqPuzzleDate(moment(reqPuzzleDate).subtract(1, 'day').format("YYYY-MM-DD"))}}/>
@@ -358,6 +362,7 @@ function App() {
         showModal && <Modal><ModalContent closeModal={toggleModal}/></Modal>
       }
     </AppContainer>
+    </MobileContext.Provider>
   );
 }
 
