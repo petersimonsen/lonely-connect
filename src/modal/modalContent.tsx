@@ -11,7 +11,7 @@ const InfoModal = ({closeModal} : {closeModal: () => void}) => {
 				</span>
 			<h4>Why?</h4>
 				<span>
-					<p>I'm not eligible for <a rel="noreferrer" href="https://www.youtube.com/results?search_query=only+connect" target="_blank">the original version</a> and they copied that idea anyway.</p>
+					<p>I'm not eligible for <a rel="noreferrer" href="https://www.youtube.com/results?search_query=only+connect" target="_blank">the original version</a> and the other guys stole their game anyway.</p>
 					<p>The original idea came because the final category, often the hardest, always feels like a 'gimme', and it's more fun to play with each of the red harrings in each puzzle all at once.</p>
 				</span>
 		</Background>

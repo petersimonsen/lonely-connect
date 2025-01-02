@@ -1,6 +1,9 @@
 import styled from 'styled-components';
 import colorVal from './Utils';
 import { WordElement } from '../data/element';
+import { useMediaQuery } from 'react-responsive'
+
+const useMobile = () => useMediaQuery({maxWidth: 640});
 
 type AnswerBarProps = {
   elements: WordElement[];
@@ -10,21 +13,25 @@ type AnswerBarProps = {
 };
 
 const AnswerBar = ({elements, categoryLevel, index, description}: AnswerBarProps) => {
-    return <AnswerBarComponent categoryLevel={categoryLevel}>
-          <h3>
+    return <AnswerBarComponent categoryLevel={categoryLevel} mobile={useMobile()}>
+          <AnswerName>
             {description}
-            </h3>
+            </AnswerName>
           <Names>
             {elements.map(el => el.name).join(", ")}</Names>
         </AnswerBarComponent>;
 };
 
-const AnswerBarComponent = styled.div<{ categoryLevel: number}>`
+const AnswerName = styled.h3`
+  margin: 0 auto 10px;
+`;
+
+const AnswerBarComponent = styled.div<{ categoryLevel: number, mobile: boolean}>`
   margin: 10px;
   padding: 10px;
   font-weight: bold;
   display: flex;
-  height: 100px;
+  height: ${props => props.mobile ? "auto" : "100px"};
   justify-content: center;
   flex-direction: column;
   align-items: center;

@@ -11,6 +11,7 @@ import useLocalStorage from './storage';
 import moment from 'moment';
 import axios from 'axios';
 import { WordElement, AnswerElement, SolvedElement, PuzzelSol } from './data/element';
+import { ConnectGrid } from './Components/grid';
 
 
 const SERVER_URL = process.env.REACT_APP_HOST_URL;
@@ -326,28 +327,22 @@ function App() {
       </HardMode>
       </div>*/}
       </SubTitle>
-      <div style={{
-        display: "grid",
-        gridTemplateColumns: "auto"
-      }}>
+      <ConnectGrid columns={1} hide={answers.length === 0}>
         {answers.map((el, i) => <AnswerBar 
             {...el}
             elements={el.answers || []}
             index={i}
             key={i}
           />)}
-      </div>
-      <div style={{
-        display: "grid",
-        gridTemplateColumns: "auto auto auto auto"
-      }}>
+      </ConnectGrid>
+      <ConnectGrid columns={4} hide={board.length === 0}>
       {guesses > 0 && board.map((el, i) => <Element 
           {...el}
           selectable={el.selectable && !loading && (!maxSelected() || el.selected)}   
           index={i}
           key={i} 
           onSelect={onTapElement} />)}
-      </div>
+      </ConnectGrid>
       {(hardMode || answers.length === 3) && <ConnectInput>{answers.length === 3 ? "Final " : ""} Connection: <input value={input} onInput={e => setInput((e.target as HTMLTextAreaElement).value)} /></ConnectInput>}
       {paintMode && <PaintContainer>{Object.keys(colorVal).map((key, i) => {
         return <ColorBox selected={key === `${catColor}`} color={colorVal[key]} onClick={() => setCatColor(Number(key))} key={`${colorVal[key]}-${i}`} />
