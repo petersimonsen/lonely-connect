@@ -6,21 +6,32 @@ const InfoModal = ({closeModal} : {closeModal: () => void}) => {
 			<h4>How to Play</h4>
 				<span>
 					<p>Phoney Connect pulls its daily puzzle from a certain other popular online game.</p>
-					<p>In this version, you submit all 16 answers at once! The specific colors you select for each category do not matter and do not correspond to difficulty.</p>
-					<p>You may only submit a valid 4x4 board.</p>
+					<p>Submit all 16 answers at once! The specific colors you select for each category do not matter and do not correspond to difficulty.</p>
+					<p>You may only submit a valid 4x4 board. You get unlimited guesses.</p>	
 				</span>
 			<h4>Why?</h4>
-				<span>
-					<p>I'm not eligible for <a rel="noreferrer" href="https://www.youtube.com/results?search_query=only+connect" target="_blank">the original version</a> and the other guys stole their game anyway.</p>
-					<p>The original idea came because the final category, often the hardest, always feels like a 'gimme', and it's more fun to play with each of the red harrings in each puzzle all at once.</p>
-				</span>
+				<List>
+					<ListItem>The final category, often the hardest, can feel like a 'gimme'</ListItem>
+					<ListItem>I needed a project. <i>You think a depressed person could make <b>*this?*</b></i></ListItem>
+					<ListItem>The other guys stole the idea anyway</ListItem>
+				</List>
 		</Background>
 	</ModalContent>);
 };
 
+const ListItem = styled.li`
+	margin-bottom: 5px;
+`;
+
+const List = styled.ol`
+	padding-inline-start: 1em;
+`;
+
 const Background = styled.div`
   background-color: #EEEEEE;
+  opacity: 0.96;
   border-radius: 40px;
+  border: 1px solid black;
   padding: 10%;
   display:flex;
   flex-direction: column;

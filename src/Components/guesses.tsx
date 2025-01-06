@@ -10,10 +10,11 @@ export const Guesses = ({ guesses, paintMode }: GuessProps) => {
     for(let i = 0; i < guesses; i++){
       guessDots.push(<Dot key={i}/>);
     }
+    const guessDisplay = (guesses > 4) ? <GuessNum>{guesses}</GuessNum> : guessDots
     if(paintMode) {
         if(guesses === 0) return null;
         return <GuessesSection>
-            Incorrect Guesses: {guessDots}
+            Phoney Connects: {guessDisplay}
         </GuessesSection>;
     }
     return <GuessesSection>
@@ -21,6 +22,9 @@ export const Guesses = ({ guesses, paintMode }: GuessProps) => {
     </GuessesSection>;
 };
 
+const GuessNum = styled.h4`
+    display: inline;
+`;
 
 const GuessesSection = styled.div`
   margin: 10px 0 20px 0;

@@ -14,6 +14,7 @@ import { WordElement, AnswerElement, SolvedElement, PuzzelSol } from './data/ele
 import { ConnectGrid } from './Components/grid';
 import { useMediaQuery } from 'react-responsive';
 import MobileContext from './data/contexts';
+import toast, { Toaster } from 'react-hot-toast';
 
 
 const SERVER_URL = process.env.REACT_APP_HOST_URL;
@@ -134,6 +135,19 @@ function App() {
       return newBoard;
   };
 
+  const toastMessage = (message: string, icon?: string) => {
+    toast.error(message, { 
+      icon,
+      style: {
+        border: '2px solid black',
+      },
+      iconTheme: {
+        primary: 'black',
+        secondary: 'white'
+      }
+     });
+  };
+
   const reconfigureBoard = (answerElements: WordElement[]) => {
       const currentAnswerNames = answers.reduce((elements: WordElement[], el) => elements.concat(el.answers), []).concat(answerElements).map(el => el.name);
       const unAnsweredBoard = board.filter((el: WordElement) => currentAnswerNames.indexOf(el.name) === -1);
@@ -157,9 +171,12 @@ function App() {
             setLoading(false);
             const { correct, answers: updatedAnswers, oneAway } = data.data;
             if(!correct){
-              const message = oneAway ? "Only Two Answers Wrong!" : "Incorrect Paint";
               addBoardToSubmissions();
-              alert(message);
+              if(oneAway) {
+                toastMessage("Only Two Answers Wrong!", "2️⃣");  
+              } else {
+                toastMessage("Incorrect Paint");
+              }
               const updatedPuzzelDates = { ...solvedDates };
               updatedPuzzelDates[reqPuzzleDate].g += 1;
               setSolvedDates(updatedPuzzelDates);
@@ -199,7 +216,7 @@ function App() {
     if(elements.length !== requiredSelection()) return;
     if(!checkSubmissions()){
       setLoading(false);
-      alert('Already Submitted!');
+      toastMessage('Already Submitted!');
       return;
     }
     if(paintMode) return submitPaint();
@@ -218,7 +235,7 @@ function App() {
         const response = data.data;
         setLoading(false);
         if(response["correct"] && response["descriptionWrong"]){
-            alert("Not the connection!");
+            toastMessage("Not the connection!");
             setGuesses(guesses - 1);
             setInput("");
         } else if(response["correct"]){
@@ -238,7 +255,7 @@ function App() {
           deselectBoard();
           reconfigureBoard(answerElements);
         } else {
-          if(response.oneAway) alert("One Away");
+          if(response.oneAway) toastMessage("One Away");
           setGuesses(guesses - 1); //only if not guessed before      
         }
         
@@ -302,6 +319,7 @@ function App() {
   return (
     <MobileContext.Provider value={useMobile()}>
     <AppContainer>
+      <Toaster />
       <DateControl>
         <Button name="< Prev" disabled={moment(reqPuzzleDate) <= moment("2024-07-01")} onSubmit={() => { setReqPuzzleDate(moment(reqPuzzleDate).subtract(1, 'day').format("YYYY-MM-DD"))}}/>
         <Title>Phoney Connect</Title>
