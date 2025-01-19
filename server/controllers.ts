@@ -1,7 +1,7 @@
 
-import { checkPuzzleFile, getPuzzleFile, requestPuzzleForDay } from './data';
+import { checkPuzzleFile, getPuzzleFile, requestPuzzleForDay, isValidFile } from './data';
 import moment from 'moment';
-import {Request, Response} from 'express';
+import { Request, Response} from 'express';
 import { checkPaintConnections, connectionsFromSubmittedVals, ConnectResponse, convertConnectSolutionBoard, convertConnectSolutionSolution, matchDescription, PaintAnswers, paintDescriptionsByCategory, parseConnectionNames, SubmittedVal } from './serverUtils';
 import { BadRequestError } from './errors/error';
 
@@ -12,7 +12,7 @@ export const getBoardHandler = async (req: Request<{}, {}, {}, { date: string }>
 			message: "No Requesting the Future"
 		});
 	}
-	if(!checkPuzzleFile(date)){
+	if(isValidFile(date) && !checkPuzzleFile(date)){
 		await requestPuzzleForDay(moment(date));
 	}
 	const currentPuzzel = getPuzzleFile(date);

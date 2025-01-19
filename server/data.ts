@@ -21,6 +21,9 @@ export const getPuzzleFile = (fileName: string) => {
 	const rawData = fs.readFileSync(`${PUZZLE_FILE_PATH}/${fileName}.json`, { encoding: 'utf8'});
 	return JSON.parse(rawData);
 };
+
+export const isValidFile = (fileName: string): boolean => moment(fileName).isValid();
+
 export const checkPuzzleFile = (fileName: string): boolean => fs.existsSync(`${PUZZLE_FILE_PATH}/${fileName}.json`);
 
 export const requestPuzzleForDay = async (day = moment()) => {
