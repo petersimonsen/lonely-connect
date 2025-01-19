@@ -18,6 +18,10 @@
 # deploy
 /deploy
 
+# log files
+/logs/*
+!/logs/test.log
+
 # puzzel files
 
 /server/puzzles/*
