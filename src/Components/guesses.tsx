@@ -27,7 +27,7 @@ const GuessNum = styled.h4`
 `;
 
 const GuessesSection = styled.div`
-  margin: 10px 0 20px 0;
+  margin: 5px 0 10px 0;
 `;
 
 const Dot = styled.div`

@@ -42,7 +42,8 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "serve": "tsc --p server && node server/dist/server.js",
-    "deploy": "npm ci && CI=true npm test && react-scripts build && npm run serve"
+    "prep": "npm ci && CI=true npm test && react-scripts build",
+    "deploy": "npm run prep && npm run serve"
   },
   "eslintConfig": {
     "extends": [

@@ -423,7 +423,7 @@ const AppContainer = styled.div`
 `;
 
 const PaintContainer = styled.div`
-  margin: 10px 0;
+  margin: 10px 0 5px;
   display:inline-block;
 `;
 
