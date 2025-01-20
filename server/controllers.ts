@@ -4,20 +4,27 @@ import moment from 'moment';
 import { Request, Response} from 'express';
 import { checkPaintConnections, connectionsFromSubmittedVals, ConnectResponse, convertConnectSolutionBoard, convertConnectSolutionSolution, matchDescription, PaintAnswers, paintDescriptionsByCategory, parseConnectionNames, SubmittedVal } from './serverUtils';
 import { BadRequestError } from './errors/error';
+import { logger } from './errors/logger';
 
 export const getBoardHandler = async (req: Request<{}, {}, {}, { date: string }>, res: Response) => {
-	const date = req.query.date;
-	if(moment(date).isAfter(moment())){
-		throw new BadRequestError({
-			message: "No Requesting the Future"
-		});
+	try {
+		const date = req.query.date;
+		if(moment(date).isAfter(moment())){
+			throw new BadRequestError({
+				message: "No Requesting the Future"
+			});
+		}
+		if(isValidFile(date) && !checkPuzzleFile(date)){
+			await requestPuzzleForDay(moment(date));
+		}
+		const currentPuzzel = getPuzzleFile(date);
+		const board = convertConnectSolutionBoard(currentPuzzel);
+		res.send(board);
+	} catch (e: any) {
+		logger.error(e);
+		res.status(e.statusCode || 500).send(e.message || "unknown error");
 	}
-	if(isValidFile(date) && !checkPuzzleFile(date)){
-		await requestPuzzleForDay(moment(date));
-	}
-	const currentPuzzel = getPuzzleFile(date);
-	const board = convertConnectSolutionBoard(currentPuzzel);
-	res.send(board);
+	
 };
 
 interface PuzzleRequest {
@@ -32,39 +39,44 @@ interface PaintReturn {
 };
 
 export const paintHandler = async(req: Request<{}, {}, PuzzleRequest, {}>, res: Response<PaintReturn>) => {
-	const date = req.body.date;
-	const submittedValues = req.body.values;
-	if(submittedValues.length !== 16) {
-		throw new BadRequestError({
-			message: "Improper value size: " + submittedValues.length,
-		});
-	}
-	if(!checkPuzzleFile(date)){
-		throw new BadRequestError({
-			message: "Date not available: " + date,
-		});
-	}
-	if(moment(date).isAfter(moment())){
-		throw new BadRequestError({
-			message: "No Requesting the Future"
-		});
-	}
-	const currentPuzzel = getPuzzleFile(date);
+	try {
+		const date = req.body.date;
+		const submittedValues = req.body.values;
+		if(submittedValues.length !== 16) {
+			throw new BadRequestError({
+				message: "Improper value size: " + submittedValues.length,
+			});
+		}
+		if(!checkPuzzleFile(date)){
+			throw new BadRequestError({
+				message: "Date not available: " + date,
+			});
+		}
+		if(moment(date).isAfter(moment())){
+			throw new BadRequestError({
+				message: "No Requesting the Future"
+			});
+		}
+		const currentPuzzel = getPuzzleFile(date);
 
-	const { correct, oneAway } = checkPaintConnections(submittedValues, currentPuzzel);
-	if(!correct){
+		const { correct, oneAway } = checkPaintConnections(submittedValues, currentPuzzel);
+		if(!correct){
+			res.send({
+				correct: false,
+				oneAway
+			});
+			return;
+		}
+		const answers = paintDescriptionsByCategory(submittedValues, currentPuzzel);
+
 		res.send({
-			correct: false,
-			oneAway
+			correct: true,
+			answers
 		});
-		return;
+	} catch (e: any) {
+		logger.error(e);
+		res.status(e.statusCode || 500).send(e.message || "unknown error");
 	}
-	const answers = paintDescriptionsByCategory(submittedValues, currentPuzzel);
-
-	res.send({
-		correct: true,
-		answers
-	});
 };
 
 /**

@@ -7,7 +7,7 @@ const path = require('path');
 const { requestPuzzleForDay } = require('./data');
 const moment = require('moment');
 const { getBoardHandler, paintHandler, connectAnswerHandler, solveHandler } = require('./controllers');
-const { errorHandlerMiddleware, loggerMiddleware } = require('./errors/middleware');
+const { loggerMiddleware } = require('./errors/middleware');
 
 require('express-async-errors');
 require('dotenv').config()
@@ -20,7 +20,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../../build')));
 app.use(loggerMiddleware);
-app.use(errorHandlerMiddleware);
 
 cron.schedule(CRON, async () => {
 	console.log(`CRON RUNNING: ${moment()}`)

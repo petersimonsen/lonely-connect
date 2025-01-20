@@ -18,12 +18,11 @@ export const logger = winston.createLogger({
       })
     ),
     transports: [
-        new winston.transports.Console(),
         new DailyRotateFile({
             filename: './logs/pc-%DATE%.log',
             datePattern: 'YYYY-MM-DD',
             zippedArchive: true,
-            maxSize: '100m',
+            maxSize: '50m',
             maxFiles: '14d'
         }),
       ],
